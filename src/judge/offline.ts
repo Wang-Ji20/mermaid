@@ -1,6 +1,6 @@
 import { clampScore } from "../core/score.ts";
 import type { Theme } from "../core/themes.ts";
-import { MAX_THEMES, type Verdict, parseVerdict } from "../core/verdict.ts";
+import { type Verdict, parseVerdict } from "../core/verdict.ts";
 import type { Judge } from "./judge.ts";
 
 /**
@@ -24,10 +24,12 @@ const THEME_WORDS: Readonly<Partial<Record<Theme, readonly string[]>>> = {
 };
 
 const BASE_SADNESS = 1;
-const SADNESS_PER_SAD_WORD = 1.5;
+const SADNESS_PER_SAD_WORD = 1;
 const WORDS_PER_LENGTH_POINT = 30;
 const MAX_LENGTH_POINTS = 3;
-const DISTINCT_WORDS_PER_ORIGINALITY_POINT = 10;
+const DISTINCT_WORDS_PER_ORIGINALITY_POINT = 6;
+/** Fewer than the verdict allows: word matches are loose, and each extra theme adds numbness. */
+const MAX_OFFLINE_THEMES = 2;
 
 const REPLIES: readonly (readonly [minSadness: number, reply: string])[] = [
   [8, "Oh... I cannot stop. Look how they fall. Thank you, and I am sorry."],
@@ -63,7 +65,7 @@ export const judgeOffline = (story: string): Verdict => {
   return parseVerdict({
     sadness,
     originality: clampScore(distinct.size / DISTINCT_WORDS_PER_ORIGINALITY_POINT),
-    themes: ranked.slice(0, MAX_THEMES).map(([theme]) => theme),
+    themes: ranked.slice(0, MAX_OFFLINE_THEMES).map(([theme]) => theme),
     reply: replyFor(sadness),
   });
 };
