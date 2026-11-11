@@ -31,10 +31,10 @@ The live checklist for current work. Long-term items live in
 
 ## Step 3: judges
 
-- [ ] `Judge` interface
-- [ ] Offline judge that scores by simple word rules
-- [ ] DeepSeek judge, API key from `DEEPSEEK_API_KEY`
-- [ ] Mermaid persona prompt
+- [x] `Judge` interface
+- [x] Offline judge that scores by simple word rules
+- [x] DeepSeek judge, API key from `DEEPSEEK_API_KEY`
+- [x] Mermaid persona prompt
 
 ## Step 4: web game
 

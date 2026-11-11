@@ -8,8 +8,8 @@ state. It does no input or output.
 
 **DeepSeek.** The company whose LLM the game calls over the internet.
 
-**Fake judge.** A judge that returns scripted verdicts without calling an
-LLM. Used in tests and for offline play.
+**Offline judge.** A judge that scores by simple word rules without calling an
+LLM. Used when no API key is set.
 
 **Felt sadness.** A story's sadness score after numbness is taken off.
 It decides how many pearls she cries.

@@ -34,7 +34,7 @@ player story
 | Component | Folder | Job |
 |-----------|--------|-----|
 | Core | `src/core/` | The rules. Pure functions, no input or output. |
-| Judge *(planned)* | `src/judge/` | Turns a story into a verdict. |
+| Judge | `src/judge/` | Turns a story into a verdict. |
 | CLI *(planned)* | `src/cli/` | Reads stories, prints results. |
 
 ## Two rules that shape everything
@@ -58,5 +58,14 @@ The core is complete. Its files, in `src/core/`:
 | `game.ts` | `GameState`, `playTurn`, win and lose |
 
 The rules are explained in [design/core.md](design/core.md).
+
+The judges are complete, in `src/judge/`:
+
+| File | Holds |
+|------|-------|
+| `judge.ts` | the `Judge` interface and `JudgeError` |
+| `offline.ts` | a judge that scores by word rules, no network |
+| `deepseek.ts` | a judge that asks the DeepSeek LLM |
+| `prompt.ts` | the mermaid persona and answer format |
 
 `src/main.ts` is still a placeholder entry point.
