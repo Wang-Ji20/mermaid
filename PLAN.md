@@ -23,10 +23,10 @@ The live checklist for current work. Long-term items live in
 
 - [x] `Verdict` type and `parseVerdict` for untrusted data
 - [x] Fixed theme list
-- [ ] Pearls: count and grade
-- [ ] Numbness to repeated themes
-- [ ] `GameState`, `playTurn`, goal and story limit
-- [ ] Properties: coins never drop; a sadder story never yields fewer
+- [x] Pearls: count and grade
+- [x] Numbness to repeated themes
+- [x] `GameState`, `playTurn`, goal and story limit
+- [x] Properties: coins never drop; a sadder story never yields fewer
       pearls
 
 ## Step 3: judges

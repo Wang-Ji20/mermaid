@@ -46,6 +46,17 @@ player story
 
 ## What exists today
 
-- `src/core/score.ts`: `clampScore` forces any number into a whole score
-  from 0 to 10.
-- `src/main.ts`: a placeholder entry point.
+The core is complete. Its files, in `src/core/`:
+
+| File | Holds |
+|------|-------|
+| `score.ts` | `clampScore`: any number to a whole score, 0 to 10 |
+| `themes.ts` | the fixed list of story themes |
+| `verdict.ts` | the `Verdict` type and `parseVerdict` |
+| `numbness.ts` | her memory of recent themes |
+| `pearls.ts` | pearl count, grade and price |
+| `game.ts` | `GameState`, `playTurn`, win and lose |
+
+The rules are explained in [design/core.md](design/core.md).
+
+`src/main.ts` is still a placeholder entry point.
