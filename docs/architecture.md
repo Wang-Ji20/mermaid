@@ -1,33 +1,34 @@
 # Architecture
 
-This is the target design. Parts marked *(planned)* are not written yet.
+Parts marked *(planned)* are not written yet.
 
 ## The game in one paragraph
 
 The player types a sad story. The little mermaid reads it and reacts. If
 it moves her, she cries, and her tears are pearls. She sells the pearls
-for coins and saves toward a goal.
+for coins and saves toward a goal: buying her voice back from the sea
+witch.
 
 ## Data flow
 
 ```
-player story
-     |
-     v
-+-----------+     verdict: sadness, originality,
-|   Judge   | --> themes, reply
-+-----------+
-     |
-     v
-+-----------+     pearls, coins,
-|   Core    | --> new game state
-+-----------+
-     |
-     v
-+-----------+
-|    CLI    | --> text on the terminal
-+-----------+
++-----------+  story   +-----------+  story   +-----------+
+|   Page    | -------> |  Server   | -------> |   Judge   |
+| (browser) |          | src/web/  | <------- | src/judge/|
++-----------+          +-----------+  verdict +-----------+
+      ^                      |
+      |                      | verdict + game state
+      |                      v
+      |                +-----------+
+      |  reply, pearls,|   Core    |
+      +--------------- | src/core/ |
+         coins         +-----------+
 ```
+
+1. The page sends the story to the server.
+2. The server asks the judge for a verdict.
+3. The core turns the verdict into pearls and coins.
+4. The server sends the result back and the page shows it.
 
 ## Components
 
@@ -35,7 +36,11 @@ player story
 |-----------|--------|-----|
 | Core | `src/core/` | The rules. Pure functions, no input or output. |
 | Judge | `src/judge/` | Turns a story into a verdict. |
-| CLI *(planned)* | `src/cli/` | Reads stories, prints results. |
+| Server | `src/web/` | Holds the games and offers them over HTTP. |
+| Page *(planned)* | `public/` | What the player sees in the browser. |
+
+`src/main.ts` wires them together: it picks a judge and starts the
+server.
 
 ## Two rules that shape everything
 
@@ -44,9 +49,9 @@ player story
 2. **The LLM is not trusted.** It gives scores. Code turns scores into
    rewards. See [design/judge.md](design/judge.md).
 
-## What exists today
+## Files
 
-The core is complete. Its files, in `src/core/`:
+Core, in `src/core/` ([design/core.md](design/core.md)):
 
 | File | Holds |
 |------|-------|
@@ -57,9 +62,7 @@ The core is complete. Its files, in `src/core/`:
 | `pearls.ts` | pearl count, grade and price |
 | `game.ts` | `GameState`, `playTurn`, win and lose |
 
-The rules are explained in [design/core.md](design/core.md).
-
-The judges are complete, in `src/judge/`:
+Judges, in `src/judge/` ([design/judge.md](design/judge.md)):
 
 | File | Holds |
 |------|-------|
@@ -68,4 +71,11 @@ The judges are complete, in `src/judge/`:
 | `deepseek.ts` | a judge that asks the DeepSeek LLM |
 | `prompt.ts` | the mermaid persona and answer format |
 
-`src/main.ts` is still a placeholder entry point.
+Server, in `src/web/` ([design/web.md](design/web.md)):
+
+| File | Holds |
+|------|-------|
+| `server.ts` | the routes: start a game, tell a story |
+| `games.ts` | the in-memory store of running games |
+| `http.ts` | reading and writing JSON over HTTP |
+| `view.ts` | the shapes of the data sent to the page |

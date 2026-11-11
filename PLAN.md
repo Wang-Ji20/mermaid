@@ -38,7 +38,7 @@ The live checklist for current work. Long-term items live in
 
 ## Step 4: web game
 
-- [ ] HTTP API: start a game, tell a story
+- [x] HTTP API: start a game, tell a story
 - [ ] Web page: story box, mermaid reply, pearls, coins, ending
 - [ ] Playable without an API key
 

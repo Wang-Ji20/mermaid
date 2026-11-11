@@ -34,5 +34,24 @@ Tests never use the network.
 npm start
 ```
 
-For now this prints a placeholder line. The game loop arrives in step 3
-of [PLAN.md](../PLAN.md).
+This starts the game server on `http://127.0.0.1:3000`. For now it
+offers only the HTTP API described in [design/web.md](design/web.md).
+The page arrives next.
+
+## Settings
+
+Settings are environment variables.
+
+| Variable | Meaning | Default |
+|----------|---------|---------|
+| `DEEPSEEK_API_KEY` | your DeepSeek key; without it the offline judge is used | none |
+| `DEEPSEEK_MODEL` | DeepSeek model name | `deepseek-chat` |
+| `DEEPSEEK_BASE_URL` | DeepSeek API address | `https://api.deepseek.com` |
+| `PORT` | port the server listens on | `3000` |
+| `HOST` | address the server listens on | `127.0.0.1` |
+
+Example:
+
+```
+DEEPSEEK_API_KEY=sk-... npm start
+```
