@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mermaid Tears</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Mermaid Tears</h1>
+        <p class="tagline">Her tears are pearls. Tell her something sad.</p>
+      </header>
+
+      <section class="purse" aria-label="Progress">
+        <div class="purse-row">
+          <span><strong id="coins">0</strong> / <span id="goal">500</span> coins</span>
+          <span><strong id="stories-left">12</strong> stories left</span>
+        </div>
+        <div
+          id="progress"
+          class="progress"
+          role="progressbar"
+          aria-label="Coins saved toward her voice"
+          aria-valuemin="0"
+          aria-valuemax="500"
+          aria-valuenow="0"
+        >
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </section>
+
+      <section class="scene" aria-live="polite">
+        <div id="mermaid" class="mermaid" aria-hidden="true">
+          <svg viewBox="0 0 100 124">
+            <path class="hair" d="M28 30C28 12 40 4 52 4s24 8 24 26c0 16 4 26 10 34-12 2-22-4-24-16H40c-2 10-10 16-20 16 6-8 8-18 8-34z" />
+            <circle class="skin" cx="52" cy="30" r="14" />
+            <path class="skin" d="M43 44h18l5 28H38z" />
+            <path class="tail" d="M38 70h28c4 14-2 26-13 33 9-1 17 2 22 9-11 4-22 2-28-5-6 7-17 9-26 5 3-7 10-10 18-9-5-10-5-22-1-33z" />
+            <path class="face" d="M45 30q2 2 4 0M56 30q2 2 4 0M49 37q3 2 6 0" />
+            <path class="tear" d="M46 34c-1.6 2.4-1.6 4 0 4s1.6-1.6 0-4z" />
+          </svg>
+        </div>
+        <div class="sand">
+          <p class="sand-label">She writes in the wet sand:</p>
+          <p id="reply" class="reply"></p>
+          <div id="pearls" class="pearls"></div>
+          <p id="earned" class="earned"></p>
+          <p id="scores" class="scores"></p>
+          <p id="numbness" class="numbness"></p>
+        </div>
+      </section>
+
+      <form id="story-form">
+        <label for="story">Your story</label>
+        <textarea
+          id="story"
+          rows="6"
+          required
+          placeholder="Something true, or something that could be…"
+        ></textarea>
+        <div class="form-row">
+          <span id="counter" class="counter"></span>
+          <button id="tell" type="submit">Tell her</button>
+        </div>
+      </form>
+
+      <section id="ending" class="ending" hidden>
+        <h2 id="ending-title"></h2>
+        <p id="ending-text"></p>
+      </section>
+
+      <p id="notice" class="notice" role="alert" hidden></p>
+
+      <section id="log-section" class="log" hidden>
+        <h2>Stories told</h2>
+        <ol id="log"></ol>
+      </section>
+
+      <footer>
+        <span>Listening: <span id="judge">…</span></span>
+        <button id="restart" type="button" class="quiet">Begin again</button>
+      </footer>
+    </main>
+  </body>
+</html>

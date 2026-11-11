@@ -7,7 +7,7 @@ The long-term plan. Current work is tracked in [PLAN.md](PLAN.md).
 - [x] Project scaffold
 - [x] Pure game core: pearls, numbness, goal and ending
 - [x] Offline judge and DeepSeek judge
-- [ ] Web page and local server
+- [x] Web page and local server
 
 ## Later
 

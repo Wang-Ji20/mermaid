@@ -3,6 +3,7 @@ import { playTurn, statusOf } from "../core/game.ts";
 import { type Judge, JudgeError } from "../judge/judge.ts";
 import { type GameStore, createGameStore } from "./games.ts";
 import { HttpError, readJson, sendJson } from "./http.ts";
+import { DEFAULT_PUBLIC_DIR, serveStatic } from "./static.ts";
 import { type NewGameResponse, type StoryResponse, gameView, turnView } from "./view.ts";
 
 export const MAX_STORY_LENGTH = 2000;
@@ -10,6 +11,8 @@ export const MAX_STORY_LENGTH = 2000;
 export type AppConfig = {
   readonly judge: Judge;
   readonly store?: GameStore;
+  /** Folder holding the page. Defaults to `public/`. */
+  readonly publicDir?: string;
   /** Where unexpected failures are reported. Silent by default. */
   readonly logError?: (error: unknown) => void;
 };
@@ -17,6 +20,7 @@ export type AppConfig = {
 type Context = {
   readonly judge: Judge;
   readonly store: GameStore;
+  readonly publicDir: string;
 };
 
 const STORY_ROUTE = /^\/api\/games\/([\w-]+)\/stories$/;
@@ -68,6 +72,9 @@ const route = async (
   response: ServerResponse,
 ): Promise<void> => {
   const { pathname } = new URL(request.url ?? "/", "http://localhost");
+  if (request.method === "GET" && (await serveStatic(context.publicDir, pathname, response))) {
+    return;
+  }
   if (request.method === "POST" && pathname === "/api/games") {
     await readJson(request);
     return sendJson(response, 201, startGame(context));
@@ -96,7 +103,11 @@ const sendFailure = (
 
 /** Builds the game's HTTP server. Call `listen` on the result to start it. */
 export const createApp = (config: AppConfig): Server => {
-  const context: Context = { judge: config.judge, store: config.store ?? createGameStore() };
+  const context: Context = {
+    judge: config.judge,
+    store: config.store ?? createGameStore(),
+    publicDir: config.publicDir ?? DEFAULT_PUBLIC_DIR,
+  };
   const logError = config.logError ?? (() => {});
   return createServer((request, response) => {
     route(context, request, response).catch((error: unknown) =>

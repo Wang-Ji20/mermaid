@@ -4,8 +4,7 @@ I want to make a genAI little mermaid game where the little mermaid's tear is pe
 
 ## Status
 
-Early scaffold. The project builds and tests, but the game loop is not
-written yet. See [PLAN.md](PLAN.md) for current work and
+Playable in the browser. See [PLAN.md](PLAN.md) for current work and
 [ROADMAP.md](ROADMAP.md) for the long-term plan.
 
 ## Quick start
@@ -15,7 +14,14 @@ Needs Node.js 24 or newer.
 ```
 npm install
 npm test     # type check + unit tests + property tests
-npm start    # run the game in the terminal
+npm start    # then open http://127.0.0.1:3000
+```
+
+Without a key, a simple offline judge scores your stories. To let the
+DeepSeek LLM judge them:
+
+```
+DEEPSEEK_API_KEY=sk-... npm start
 ```
 
 ## Documentation

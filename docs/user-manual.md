@@ -34,9 +34,27 @@ Tests never use the network.
 npm start
 ```
 
-This starts the game server on `http://127.0.0.1:3000`. For now it
-offers only the HTTP API described in [design/web.md](design/web.md).
-The page arrives next.
+Then open `http://127.0.0.1:3000` in a browser.
+
+Without a DeepSeek key the **offline judge** listens. It scores by
+simple word rules and its replies are canned. It is enough to try the
+game. Set `DEEPSEEK_API_KEY` (see Settings) to let the LLM judge.
+
+## How to play
+
+1. Type a sad story and press **Tell her**.
+2. The mermaid answers. If the story moved her, pearls fall and are
+   sold for coins.
+3. Reach 500 coins within 12 stories to buy back her voice.
+
+Tips:
+
+- Sadder stories give more pearls.
+- Specific, personal stories give finer pearls, which sell for more.
+- She grows numb to themes she has heard in her last three stories.
+  Vary what you tell her.
+
+The exact rules are in [design/core.md](design/core.md).
 
 ## Settings
 

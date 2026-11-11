@@ -1,7 +1,8 @@
-# Design: the web server
+# Design: the web server and page
 
 The game runs as a small local web server (`src/web/`). The browser
-shows the page; the server holds the games and talks to the judge.
+shows the page (`public/`); the server holds the games and talks to the
+judge.
 
 ```
 browser                     server                      judge
@@ -65,7 +66,65 @@ Every error is `{ "error": "a sentence the page can show" }`.
 | 415 | body not sent as JSON |
 | 502 | the judge failed; the story did not count |
 
+## The page
+
+```
++------------------------------------------+
+|              Mermaid Tears               |
+|  200 / 500 coins          8 stories left |
+|  [==========--------------]              |
+|                                          |
+|  (mermaid)  She writes in the wet sand:  |
+|             "My eyes sting..."           |
+|             o o o o                      |
+|             4 round pearls, +60 coins    |
+|             Sadness 7/10 ...             |
+|                                          |
+|  Your story                              |
+|  [                                    ]  |
+|  0 / 2000                    [Tell her]  |
+|                                          |
+|  Stories told                            |
+|  1. My grandmother...   8 round pearls   |
++------------------------------------------+
+```
+
+The page shows the scores and any numbness after each story. The player
+can then see *why* a story earned what it did and learn to vary themes.
+
+When the game ends, the story box gives way to the ending text.
+"Begin again" starts a new game at any time.
+
 ## Decisions
+
+### The page holds no rules
+
+`public/app.js` only sends stories and shows answers. Every number on
+screen comes from the server. The rules exist once, in the core.
+
+### The page is plain JavaScript
+
+Browsers cannot run TypeScript, and the project has no build step. So
+the page is one plain JavaScript file. It is still type-checked: it
+describes its types in comments (JSDoc) and imports the answer shapes
+from `src/web/view.ts`. If the server's answers change shape, `npm test`
+fails until the page follows.
+
+### Text from the judge is shown as text
+
+The mermaid's reply comes from an LLM, and the story log repeats what
+the player typed. Both are placed on the page as plain text, never as
+HTML. A reply containing `<script>` shows as those characters and does
+not run.
+
+A content security policy (a rule the server sends with the page) adds
+a second guard: the browser runs scripts only from this server.
+
+### The server hands out a fixed list of files
+
+`src/web/static.ts` knows three files: the page, its style and its
+script. A request path is looked up in that list and never turned into
+a file path. So no request can read other files on the machine.
 
 ### The server holds the game state
 

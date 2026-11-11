@@ -1,7 +1,5 @@
 # Architecture
 
-Parts marked *(planned)* are not written yet.
-
 ## The game in one paragraph
 
 The player types a sad story. The little mermaid reads it and reacts. If
@@ -37,7 +35,7 @@ witch.
 | Core | `src/core/` | The rules. Pure functions, no input or output. |
 | Judge | `src/judge/` | Turns a story into a verdict. |
 | Server | `src/web/` | Holds the games and offers them over HTTP. |
-| Page *(planned)* | `public/` | What the player sees in the browser. |
+| Page | `public/` | What the player sees in the browser. |
 
 `src/main.ts` wires them together: it picks a judge and starts the
 server.
@@ -78,4 +76,13 @@ Server, in `src/web/` ([design/web.md](design/web.md)):
 | `server.ts` | the routes: start a game, tell a story |
 | `games.ts` | the in-memory store of running games |
 | `http.ts` | reading and writing JSON over HTTP |
+| `static.ts` | serving the page's files |
 | `view.ts` | the shapes of the data sent to the page |
+
+Page, in `public/` ([design/web.md](design/web.md)):
+
+| File | Holds |
+|------|-------|
+| `index.html` | the layout and the mermaid drawing |
+| `style.css` | the look |
+| `app.js` | sends stories, shows results |

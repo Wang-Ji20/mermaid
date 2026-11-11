@@ -1,0 +1,337 @@
+:root {
+  --deep: #06202e;
+  --sea: #0d3b4f;
+  --foam: #e8f4f2;
+  --mist: #a9c8cc;
+  --sand: #f2e6cf;
+  --ink: #3b2f20;
+  --gold: #e7b755;
+  --coral: #f08a7b;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--deep);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--sea) 0%, var(--deep) 70%);
+  background-attachment: fixed;
+  color: var(--foam);
+  font: 1rem/1.55 Georgia, "Times New Roman", serif;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+header {
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+}
+
+h2 {
+  font-size: 1.15rem;
+  font-weight: normal;
+}
+
+.tagline {
+  margin: 0.2rem 0 1.5rem;
+  color: var(--mist);
+  font-style: italic;
+}
+
+/* Coins and stories left */
+
+.purse-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.progress {
+  height: 0.6rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 12%);
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: 1rem;
+  background: var(--gold);
+  transition: width 0.8s ease;
+}
+
+/* The mermaid and her sand */
+
+.scene {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.mermaid {
+  width: 5.5rem;
+  flex-shrink: 0;
+}
+
+.mermaid svg {
+  display: block;
+}
+
+.mermaid .hair {
+  fill: var(--coral);
+}
+
+.mermaid .skin {
+  fill: #f6d9c3;
+}
+
+.mermaid .tail {
+  fill: #3fa796;
+}
+
+.mermaid .face {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.mermaid .tear {
+  fill: #fff;
+}
+
+.mermaid.listening {
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+.sand {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.9rem;
+  background: var(--sand);
+  color: var(--ink);
+}
+
+.sand p {
+  margin: 0;
+}
+
+.sand-label {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+.reply {
+  font-size: 1.1rem;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.pearls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.4rem;
+  margin-top: 0.7rem;
+}
+
+.pearl {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #e9e3ee 55%, #b9aec4);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 35%);
+  animation: fall 0.6s ease-in backwards;
+}
+
+.pearl.seed {
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+.pearl.black {
+  background: radial-gradient(circle at 30% 30%, #9fb4c9, #2b3148 50%, #0d0f1c);
+}
+
+.earned {
+  font-weight: bold;
+}
+
+.scores,
+.numbness {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+/* Telling a story */
+
+form {
+  display: grid;
+  gap: 0.4rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 0.6rem;
+  background: rgb(0 0 0 / 25%);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.form-row,
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.counter {
+  color: var(--mist);
+  font-size: 0.85rem;
+}
+
+.counter.over {
+  color: var(--coral);
+}
+
+button {
+  padding: 0.55rem 1.3rem;
+  border: 0;
+  border-radius: 2rem;
+  background: var(--gold);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+button.quiet {
+  padding: 0.3rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: transparent;
+  color: var(--mist);
+  font-size: 0.85rem;
+}
+
+/* Messages, ending, log */
+
+.notice {
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--coral);
+  background: rgb(240 138 123 / 12%);
+}
+
+.ending {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--gold);
+  border-radius: 0.9rem;
+  text-align: center;
+}
+
+.ending h2 {
+  margin: 0 0 0.4rem;
+  color: var(--gold);
+  font-size: 1.4rem;
+}
+
+.ending p {
+  margin: 0;
+}
+
+.log ol {
+  margin: 0;
+  padding-left: 1.3rem;
+  color: var(--mist);
+}
+
+.log li {
+  margin-bottom: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.log .result {
+  display: block;
+  color: var(--foam);
+  font-size: 0.85rem;
+}
+
+footer {
+  margin-top: 2rem;
+  color: var(--mist);
+  font-size: 0.85rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@keyframes fall {
+  from {
+    opacity: 0;
+    transform: translateY(-2.5rem);
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-0.35rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pearl,
+  .mermaid.listening {
+    animation: none;
+  }
+
+  .progress-fill {
+    transition: none;
+  }
+}
+
+@media (max-width: 30rem) {
+  .scene {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sand {
+    width: 100%;
+  }
+}
