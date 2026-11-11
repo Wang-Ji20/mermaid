@@ -44,5 +44,10 @@ The live checklist for current work. Long-term items live in
 
 ## Step 5: polish
 
-- [ ] Cleanup pass
-- [ ] Docs complete
+- [x] Cleanup pass
+- [x] Docs complete
+
+## Open
+
+- [ ] Try the DeepSeek judge with a real key. Its request and parsing
+      are tested against canned responses only.
