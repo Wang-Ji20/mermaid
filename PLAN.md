@@ -6,7 +6,9 @@ The live checklist for current work. Long-term items live in
 ## Decisions
 
 - Language: TypeScript on Node.js 24, run directly without a build step.
-- Interface: terminal first, web later.
+- Interface: a web page served by a small local server. The terminal
+  version first planned was dropped: the web page plus the offline judge
+  covers the same need.
 - LLM: DeepSeek API. Tests never call it.
 - Tone: bittersweet fairy tale.
 
@@ -19,35 +21,28 @@ The live checklist for current work. Long-term items live in
 
 ## Step 2: pure core
 
-- [ ] `Verdict` type: sadness, originality, themes, reply
-- [ ] `GameState` type: coins, pearls, goal
-- [ ] `mintPearls`: verdict to pearls
-- [ ] `sellPearls`: pearls to coins
-- [ ] Properties: coins never go negative; a sadder story never yields
-      fewer pearls
+- [x] `Verdict` type and `parseVerdict` for untrusted data
+- [x] Fixed theme list
+- [ ] Pearls: count and grade
+- [ ] Numbness to repeated themes
+- [ ] `GameState`, `playTurn`, goal and story limit
+- [ ] Properties: coins never drop; a sadder story never yields fewer
+      pearls
 
-## Step 3: offline CLI
+## Step 3: judges
 
-- [ ] `Judge` interface and a scripted fake judge
-- [ ] Read-story, judge, mint, sell loop in the terminal
+- [ ] `Judge` interface
+- [ ] Offline judge that scores by simple word rules
+- [ ] DeepSeek judge, API key from `DEEPSEEK_API_KEY`
+- [ ] Mermaid persona prompt
+
+## Step 4: web game
+
+- [ ] HTTP API: start a game, tell a story
+- [ ] Web page: story box, mermaid reply, pearls, coins, ending
 - [ ] Playable without an API key
 
-## Step 4: DeepSeek judge
+## Step 5: polish
 
-- [ ] DeepSeek client, API key from `DEEPSEEK_API_KEY`
-- [ ] Mermaid persona prompt
-- [ ] Parse and clamp the JSON verdict
-- [ ] Recorded-response fixtures for tests
-
-## Step 5: depth
-
-- [ ] Numbness to repeated themes
-- [ ] Pearl grades
-- [ ] Market prices
-- [ ] Goal and ending
-
-## Step 6: polish
-
-- [ ] Save and load
 - [ ] Cleanup pass
 - [ ] Docs complete

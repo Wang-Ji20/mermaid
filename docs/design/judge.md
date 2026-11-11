@@ -39,6 +39,28 @@ whole number from 0 to 10.
 | -3 | 0 | raised |
 | NaN | 0 | unusable, so the story earns nothing |
 
+## The whole verdict is checked the same way
+
+`parseVerdict` in `src/core/verdict.ts` takes any data at all and always
+returns a valid verdict. It never throws.
+
+| Field | Rule | If unusable |
+|-------|------|-------------|
+| `sadness` | clamped to 0..10 | 0 |
+| `originality` | clamped to 0..10 | 0 |
+| `themes` | up to 3, from the fixed list only | `["other"]` |
+| `reply` | at most 600 characters | a silent look |
+
+So bad data can only make a story earn less, never more.
+
+## Why themes come from a fixed list
+
+The game checks whether the mermaid has heard a theme before. That needs
+labels that match exactly. If the LLM invented labels freely, one story
+might say "grief" and the next "mourning", and the game would miss the
+repetition. The list lives in `src/core/themes.ts`. Labels outside it
+are dropped.
+
 ## Alternatives considered
 
 - **Let the LLM pick the pearl count.** Simplest, but open to the trick
