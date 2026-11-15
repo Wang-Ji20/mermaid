@@ -6,7 +6,7 @@ The player types a sad story. The little mermaid reads it and reacts. If
 it moves her, she cries, and her tears are pearls. She keeps them in a
 purse and sells them to the pearl merchant, whose prices change after
 every story. The coins go toward a goal: buying her voice back from the
-sea witch.
+sea witch. The witch offers one bargain: more time, for a higher price.
 
 ## Data flow
 
@@ -66,7 +66,7 @@ Core, in `src/core/` ([design/core.md](design/core.md)):
 | `random.ts` | seeded random numbers, so chance stays pure |
 | `market.ts` | the merchant's prices, changing day by day |
 | `purse.ts` | the pearls she holds and what they are worth |
-| `game.ts` | `GameState`, `playTurn`, `sellPearls`, win and lose |
+| `game.ts` | `GameState`, `playTurn`, `sellPearls`, `takeBargain`, win and lose |
 | `ending.ts` | which of the endings a finished game gets |
 | `save.ts` | `parseGameState`: a saved game checked before it is played |
 | `record.ts` | `isRecord`, a helper for reading untrusted data |
@@ -84,7 +84,7 @@ Server, in `src/web/` ([design/web.md](design/web.md)):
 
 | File | Holds |
 |------|-------|
-| `server.ts` | the routes: start a game, fetch it, tell a story, sell pearls |
+| `server.ts` | the routes: start a game, fetch it, tell a story, sell pearls, take the bargain |
 | `games.ts` | the store of running games |
 | `saves.ts` | the save file that keeps games between runs |
 | `http.ts` | reading and writing JSON over HTTP |

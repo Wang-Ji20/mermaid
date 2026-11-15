@@ -1,8 +1,11 @@
 import {
+  BARGAIN_PRICE,
+  BARGAIN_STORIES,
   type GameState,
   type GameStatus,
   type Sale,
   type TurnOutcome,
+  canBargain,
   statusOf,
 } from "../core/game.ts";
 import { type Ending, endingOf } from "../core/ending.ts";
@@ -21,6 +24,12 @@ export type StallRow = {
   readonly held: number;
 };
 
+/** What the sea witch offers: more stories, for a higher goal. */
+export type BargainOffer = {
+  readonly stories: number;
+  readonly price: number;
+};
+
 /**
  * What the page may know about a game. Her memory and the market's seed
  * stay on the server: the page must not see tomorrow's prices.
@@ -34,6 +43,8 @@ export type GameView = {
   readonly ending: Ending | null;
   /** One row per grade, plainest first. */
   readonly stall: readonly StallRow[];
+  /** The witch's offer; `null` once it is taken or the game is over. */
+  readonly bargain: BargainOffer | null;
 };
 
 /** One told story: what the judge said and what it earned. */
@@ -52,6 +63,11 @@ export type GameResponse = {
 export type StoryResponse = {
   readonly game: GameView;
   readonly turn: TurnView;
+};
+
+/** Answer to "take the bargain". */
+export type BargainResponse = {
+  readonly game: GameView;
 };
 
 /** Answer to "sell pearls". */
@@ -78,6 +94,7 @@ export const gameView = (state: GameState): GameView => ({
   status: statusOf(state),
   ending: endingOf(state) ?? null,
   stall: GRADES.map((grade) => stallRow(state, grade)),
+  bargain: canBargain(state) ? { stories: BARGAIN_STORIES, price: BARGAIN_PRICE } : null,
 });
 
 export const turnView = (verdict: Verdict, outcome: TurnOutcome): TurnView => ({

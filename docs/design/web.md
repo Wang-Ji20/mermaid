@@ -44,7 +44,7 @@ Send `{}`. The answer:
   "maxStoryLength": 2000,
   "game": {
     "coins": 0, "goal": 500, "storiesLeft": 12, "status": "playing",
-    "ending": null,
+    "ending": null, "bargain": { "stories": 3, "price": 150 },
     "stall": [
       { "grade": "seed", "price": 5, "standingPrice": 5, "held": 0 },
       { "grade": "round", "price": 15, "standingPrice": 15, "held": 0 },
@@ -55,7 +55,11 @@ Send `{}`. The answer:
 ```
 
 `ending` is `null` while the game is in play. Afterwards it names the
-ending: `swift`, `won`, `near` or `lost` ([core.md](core.md#goal-and-ending)).
+ending: `swift`, `won`, `bargain`, `near` or `lost`
+([core.md](core.md#goal-and-ending)).
+
+`bargain` is the sea witch's offer. It is `null` once the offer is taken
+or the game is over.
 
 `stall` has one row per pearl grade: today's price, the usual price and
 how many pearls of that grade she holds. Every `game` in every answer
@@ -102,6 +106,12 @@ today's price. The answer:
 }
 ```
 
+### Take the witch's bargain: `POST /api/games/<id>/bargain`
+
+Send `{}`. The answer is `{ "game": ... }` with more stories left, a
+higher goal and `bargain: null`
+([core.md](core.md#the-sea-witchs-bargain)).
+
 ### Errors
 
 Every error is `{ "error": "a sentence the page can show" }`.
@@ -110,7 +120,7 @@ Every error is `{ "error": "a sentence the page can show" }`.
 |--------|------|
 | 400 | empty story, story over 2000 characters, unknown grade, malformed JSON |
 | 404 | unknown game or path |
-| 409 | the game has ended, a story is still being judged, or she holds no pearls of the grade to sell |
+| 409 | the game has ended, a story is still being judged, she holds no pearls of the grade to sell, or the bargain was already taken |
 | 413 | request body over 16 KB |
 | 415 | body not sent as JSON |
 | 502 | the judge failed; the story did not count |
@@ -128,6 +138,10 @@ Every error is `{ "error": "a sentence the page can show" }`.
 |  O Round pearls  17 each, above 15 [Sell]|
 |  * Black pearls  40 each, usual   [Sell] |
 |  Sold 5 round pearls at 17 each: +85     |
+|                                          |
+|  The sea witch                           |
+|  "I can wait 3 stories longer. My price  |
+|  rises by 150 coins."  [Take her bargain]|
 |                                          |
 |  (mermaid)  She writes in the wet sand:  |
 |             "My eyes sting..."           |
@@ -150,6 +164,11 @@ can then see *why* a story earned what it did and learn to vary themes.
 Each sell button says what it would pay, such as "Sell 5 for 85". The
 price line says whether today is above or below the usual price, in
 words and not only in colour.
+
+The sea witch's box shows her offer in her own words, with the numbers
+from the server. It disappears once the bargain is taken. One click
+takes it and there is no "are you sure?": the offer says plainly what
+it costs and that it comes once.
 
 When the game ends, the story box and the merchant give way to the
 ending text. The page has one title and one text for each ending the
@@ -284,13 +303,13 @@ Judging takes seconds. If the page sent two stories at once, both would
 start from the same state and one result would overwrite the other. So
 a game is locked while a story is judged, and a second story gets a 409.
 
-A sale during that wait gets a 409 too. It could win the game while the
+A sale or a bargain during that wait gets a 409 too. It could win the game while the
 story is still with the judge, and the story would come back to a game
 that is already over.
 
 ### No web framework
 
-The server uses Node's built-in `http` module. There are four routes;
+The server uses Node's built-in `http` module. There are five routes;
 a framework would be more code to learn than it saves.
 
 ### Only JSON bodies are accepted

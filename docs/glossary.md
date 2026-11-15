@@ -1,5 +1,8 @@
 # Glossary
 
+**Bargain.** The sea witch's offer, made once in each game: 3 more
+stories, and the goal rises by 150 coins.
+
 **Closing sale.** The sale of everything left in the purse after the
 last story, at that day's prices.
 

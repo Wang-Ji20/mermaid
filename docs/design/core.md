@@ -66,14 +66,15 @@ has 12 stories.
 - Reach 500 coins: **won**.
 - Use all 12 stories first: **lost**.
 
-How the game was won or lost picks one of four **endings**
+How the game was won or lost picks one of five **endings**
 (`ending.ts`):
 
 | Ending | When |
 |--------|------|
-| `swift` | won with 6 or more stories untold |
-| `won` | any other win |
-| `near` | lost with at least four fifths of the goal (400 coins) |
+| `swift` | won with 6 or more stories untold, without the bargain |
+| `won` | any other win without the bargain |
+| `bargain` | won after taking [the sea witch's bargain](#the-sea-witchs-bargain) |
+| `near` | lost with at least four fifths of the goal |
 | `lost` | any other loss |
 
 The ending changes only the last page of the tale. A near loss is still
@@ -84,6 +85,39 @@ tested like any other rule.
 A solid story is worth about 75 coins at standing prices, so 7 good,
 varied stories win. A good eye for the market needs fewer; selling on
 bad days needs more. The limit gives each story weight.
+
+## The sea witch's bargain
+
+Once in each game the player may take the witch's bargain
+(`takeBargain` in `game.ts`): 3 more stories, and the goal rises by 150
+coins.
+
+```
+before   120 / 500 coins    2 stories left
+bargain
+after    120 / 650 coins    5 stories left     (offer gone)
+```
+
+Decisions:
+
+- **A way back, at a price.** A player who started badly has a second
+  chance. A solid story is worth about 75 coins, so three stories can
+  bring about 225 for the 150 they cost. Told well they pay; told
+  badly the game is lost by more.
+- **Once only.** Offered again and again it would make the story limit
+  mean nothing.
+- **Before the last story.** When the stories run out the game is
+  over, and the witch does not reopen it. The player has to judge the
+  need while there is still time.
+- **It marks the ending.** A voice won back on the witch's terms gets
+  the `bargain` ending, never the swift one: she keeps one note. The
+  help is real, and so is the cost. That fits the tale.
+- **A near loss is measured against the raised goal**: 520 of 650
+  coins, not 400.
+
+The alternative was a loan of coins to repay. That needs interest and
+a debt to track, and coins that go down, which the rest of the rules
+never do.
 
 ## The pearl market
 
@@ -182,8 +216,12 @@ Decisions:
   it, because a judge's mistake should only cost a story. A save is
   different: any guess at a missing field could hand out coins or
   change tomorrow's prices. A damaged game is dropped whole.
-- **The goal must match.** A save with another goal comes from other
-  rules. It is refused like any other damage.
+- **The goal must match.** It is 500, or 650 with the bargain. A save
+  with any other goal comes from other rules and is refused like any
+  other damage. The same goes for more stories than the game allows.
+- **An older save still loads.** Saves written before the bargain
+  existed have no `bargained` field. Then it was not taken: that is a
+  fact about the old version, not a guess.
 - **Extra fields are dropped.** Only the known fields are copied, so
   nothing unknown rides along into the game.
 
@@ -199,7 +237,8 @@ Where the save file lives is the server's business: see
 - A sale swaps pearls for exactly their worth: coins plus purse value
   stays the same.
 - When the stories run out, nothing is left unsold.
-- Every game ends within 12 stories.
+- Every game ends within 12 stories, or 15 with the bargain, whenever
+  it is taken.
 - Market prices stay within 60% to 150%, and a finer grade is never
   cheaper than a plainer one.
 - The same seed always gives the same prices.

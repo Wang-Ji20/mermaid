@@ -9,6 +9,8 @@
 /** @typedef {import("../src/web/view.ts").GameResponse} GameResponse */
 /** @typedef {import("../src/web/view.ts").StoryResponse} StoryResponse */
 /** @typedef {import("../src/web/view.ts").SaleResponse} SaleResponse */
+/** @typedef {import("../src/web/view.ts").BargainResponse} BargainResponse */
+/** @typedef {import("../src/web/view.ts").BargainOffer} BargainOffer */
 
 const GREETING =
   "I sold my voice to the sea witch. She will sell it back for coins, and my tears are pearls. " +
@@ -16,6 +18,9 @@ const GREETING =
 const WELCOME_BACK =
   "You came back. I kept my purse closed while you were away. Will you tell me another?";
 const TALE_TOLD = "Our tale is told. Begin again, and I will listen as if for the first time.";
+const BARGAIN_STRUCK =
+  "She nods to the witch, and does not look at you for a while. More stories to tell, " +
+  "and a heavier purse to fill.";
 const LISTENING = "…";
 /** Where the browser keeps the id of the game in play, so a reload can resume it. */
 const GAME_ID_KEY = "mermaid-tears.game";
@@ -38,6 +43,13 @@ const ENDINGS = {
       "The sea witch counts the coins twice, then opens her hand. The little mermaid tries one " +
       "note, and it comes out as a song. “Thank you,” she says aloud, “for trusting me with " +
       "your sorrows.”",
+  },
+  bargain: {
+    title: "A voice, on the witch's terms",
+    text:
+      "The sea witch takes the heavier purse and gives the voice back, all but one note, which " +
+      "she keeps “for the waiting”. The little mermaid sings, and only she can hear what is " +
+      "missing. “It is mine again,” she tells you. “Nearly all of it. Thank you.”",
   },
   near: {
     title: "Almost a song",
@@ -78,6 +90,9 @@ const ui = {
   market: element("market", HTMLElement),
   stall: element("stall", HTMLUListElement),
   sale: element("sale", HTMLElement),
+  witch: element("witch", HTMLElement),
+  witchOffer: element("witch-offer", HTMLElement),
+  bargain: element("bargain", HTMLButtonElement),
   mermaid: element("mermaid", HTMLElement),
   reply: element("reply", HTMLElement),
   pearls: element("pearls", HTMLElement),
@@ -199,9 +214,16 @@ const stallRow = (row) => {
   return item;
 };
 
+/** @param {BargainOffer} offer */
+const offerText = ({ stories, price }) =>
+  `“Short of time, little one? I can wait ${stories} stories longer. ` +
+  `But waiting costs: my price rises by ${plural(price, "coin")}. I offer this once.”`;
+
 /** @param {GameView} game */
 const showGame = (game) => {
   ui.stall.replaceChildren(...game.stall.map(stallRow));
+  ui.witch.hidden = game.bargain === null;
+  if (game.bargain !== null) ui.witchOffer.textContent = offerText(game.bargain);
   ui.coins.textContent = String(game.coins);
   ui.goal.textContent = String(game.goal);
   ui.storiesLeft.textContent = String(game.storiesLeft);
@@ -287,13 +309,14 @@ const showCounter = () => {
 };
 
 /**
- * Locks the story box and the sell buttons while the server works.
+ * Locks the story box, the sell buttons and the bargain while the server works.
  * @param {boolean} busy
  */
 const setBusy = (busy) => {
   session.busy = busy;
   ui.tell.disabled = busy;
   ui.story.readOnly = busy;
+  ui.bargain.disabled = busy;
   for (const button of ui.stall.querySelectorAll("button")) {
     button.disabled = busy || button.dataset.empty === "true";
   }
@@ -400,11 +423,29 @@ const sellGrade = async (grade) => {
   }
 };
 
+const takeBargain = async () => {
+  if (session.busy) return;
+  showNotice(null);
+  setBusy(true);
+  try {
+    /** @type {BargainResponse} */
+    const { game } = await post(`/api/games/${session.id}/bargain`, {});
+    ui.reply.textContent = BARGAIN_STRUCK;
+    clearTurn();
+    showGame(game);
+  } catch (error) {
+    showNotice(error instanceof Error ? error.message : String(error));
+  } finally {
+    setBusy(false);
+  }
+};
+
 ui.form.addEventListener("submit", (event) => {
   event.preventDefault();
   void tellStory();
 });
 ui.story.addEventListener("input", showCounter);
+ui.bargain.addEventListener("click", () => void takeBargain());
 ui.restart.addEventListener("click", () => void startGame());
 
 void openPage();

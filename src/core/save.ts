@@ -1,4 +1,4 @@
-import { GOAL, type GameState, STORY_LIMIT } from "./game.ts";
+import { BARGAIN_PRICE, BARGAIN_STORIES, GOAL, type GameState, STORY_LIMIT } from "./game.ts";
 import { MAX_PERCENT, MIN_PERCENT, type Market } from "./market.ts";
 import { MEMORY_SPAN, type Memory } from "./numbness.ts";
 import type { Grade } from "./pearls.ts";
@@ -50,6 +50,16 @@ const parseMarket = (raw: unknown): Market | undefined => {
   return percent && { seed: raw["seed"], percent };
 };
 
+/** Saves from before the bargain existed have no such field: it was not taken. */
+const parseBargained = (raw: unknown): boolean | undefined =>
+  raw === undefined ? false : typeof raw === "boolean" ? raw : undefined;
+
+/** The goal and the most stories a game can have left, with or without the bargain. */
+const limitsFor = (bargained: boolean): { readonly goal: number; readonly stories: number } =>
+  bargained
+    ? { goal: GOAL + BARGAIN_PRICE, stories: STORY_LIMIT + BARGAIN_STORIES }
+    : { goal: GOAL, stories: STORY_LIMIT };
+
 /**
  * Builds a game state from untrusted saved data.
  *
@@ -63,9 +73,10 @@ export const parseGameState = (raw: unknown): GameState | undefined => {
   const memory = parseMemory(raw["memory"]);
   const purse: Purse | undefined = parseByGrade(raw["purse"], 0, Number.MAX_SAFE_INTEGER);
   const market = parseMarket(raw["market"]);
-  if (!isCount(coins) || goal !== GOAL || !isWholeBetween(storiesLeft, 0, STORY_LIMIT)) {
-    return undefined;
-  }
+  const bargained = parseBargained(raw["bargained"]);
   if (memory === undefined || purse === undefined || market === undefined) return undefined;
-  return { coins, goal, storiesLeft, memory, purse, market };
+  if (bargained === undefined || !isCount(coins)) return undefined;
+  const limits = limitsFor(bargained);
+  if (goal !== limits.goal || !isWholeBetween(storiesLeft, 0, limits.stories)) return undefined;
+  return { coins, goal, storiesLeft, memory, purse, market, bargained };
 };

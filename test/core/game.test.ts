@@ -1,13 +1,17 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+  BARGAIN_PRICE,
+  BARGAIN_STORIES,
   GOAL,
   type GameState,
   STORY_LIMIT,
+  canBargain,
   newGame,
   playTurn,
   sellPearls,
   statusOf,
+  takeBargain,
 } from "../../src/core/game.ts";
 import { nextDay, pricesOf } from "../../src/core/market.ts";
 import { GRADES } from "../../src/core/pearls.ts";
@@ -220,6 +224,22 @@ describe("statusOf", () => {
     );
   });
 
+  it("ends within the longer limit even with the bargain, whenever it is taken", () => {
+    const longest = STORY_LIMIT + BARGAIN_STORIES;
+    fc.assert(
+      fc.property(
+        seed,
+        fc.array(verdict, { minLength: longest, maxLength: longest }),
+        fc.integer({ min: 0, max: STORY_LIMIT - 1 }),
+        (start, verdicts, told) => {
+          const before = playAll(verdicts.slice(0, told), newGame(start));
+          const after = canBargain(before) ? takeBargain(before) : before;
+          return statusOf(playAll(verdicts.slice(told), after)) !== "playing";
+        },
+      ),
+    );
+  });
+
   it("leaves nothing unsold when the stories run out", () => {
     fc.assert(
       fc.property(
@@ -232,5 +252,34 @@ describe("statusOf", () => {
         },
       ),
     );
+  });
+});
+
+describe("the sea witch's bargain", () => {
+  it("adds stories and raises the goal, and touches nothing else", () => {
+    const purse = { seed: 4, round: 0, black: 1 };
+    const before = { ...newGame(1), coins: 120, storiesLeft: 2, purse };
+    expect(takeBargain(before)).toEqual({
+      ...before,
+      storiesLeft: 2 + BARGAIN_STORIES,
+      goal: GOAL + BARGAIN_PRICE,
+      bargained: true,
+    });
+  });
+
+  it("is offered once", () => {
+    const bargained = takeBargain(newGame());
+    expect(canBargain(bargained)).toBe(false);
+    expect(() => takeBargain(bargained)).toThrow();
+  });
+
+  it("is not offered after the game has ended", () => {
+    expect(canBargain({ ...newGame(), storiesLeft: 0 })).toBe(false);
+    expect(canBargain({ ...newGame(), coins: GOAL })).toBe(false);
+  });
+
+  it("can turn a game that was nearly won back into one still to be won", () => {
+    const nearly = { ...newGame(), coins: GOAL - 1 };
+    expect(statusOf(takeBargain(nearly))).toBe("playing");
   });
 });

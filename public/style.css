@@ -143,6 +143,11 @@ button.sell:disabled {
   cursor: default;
 }
 
+button.bargain {
+  padding: 0.3rem 0.9rem;
+  font-size: 0.9rem;
+}
+
 .sale {
   min-height: 1.5rem;
   margin: 0.6rem 0 0;

@@ -1,11 +1,19 @@
 import { type IncomingMessage, type Server, type ServerResponse, createServer } from "node:http";
-import { type GameState, playTurn, sellPearls, statusOf } from "../core/game.ts";
+import {
+  type GameState,
+  canBargain,
+  playTurn,
+  sellPearls,
+  statusOf,
+  takeBargain,
+} from "../core/game.ts";
 import { type Grade, isGrade } from "../core/pearls.ts";
 import { type Judge, JudgeError } from "../judge/judge.ts";
 import { type GameStore, createGameStore } from "./games.ts";
 import { HttpError, readJson, sendJson } from "./http.ts";
 import { DEFAULT_PUBLIC_DIR, serveStatic } from "./static.ts";
 import {
+  type BargainResponse,
   type GameResponse,
   type SaleResponse,
   type StoryResponse,
@@ -32,6 +40,7 @@ type Context = {
 
 const GAME_ROUTE = /^\/api\/games\/([\w-]+)$/;
 const STORY_ROUTE = /^\/api\/games\/([\w-]+)\/stories$/;
+const BARGAIN_ROUTE = /^\/api\/games\/([\w-]+)\/bargain$/;
 const SALE_ROUTE = /^\/api\/games\/([\w-]+)\/sales$/;
 
 const STILL_LISTENING = "She is still listening to your last story.";
@@ -116,6 +125,19 @@ const sellGrade = (context: Context, id: string, body: unknown): SaleResponse =>
   return { game: gameView(sold.state), sale: sold.sale };
 };
 
+/**
+ * Takes the witch's bargain. Refused while a story is being judged, like
+ * a sale: the story would come back to a game with other limits.
+ */
+const strikeBargain = (context: Context, id: string): BargainResponse => {
+  const state = gameInPlay(context, id);
+  if (context.store.isLocked(id)) throw new HttpError(409, STILL_LISTENING);
+  if (!canBargain(state)) throw new HttpError(409, "The sea witch makes her offer only once.");
+  const bargained = takeBargain(state);
+  context.store.set(id, bargained);
+  return { game: gameView(bargained) };
+};
+
 const route = async (
   context: Context,
   request: IncomingMessage,
@@ -142,6 +164,11 @@ const route = async (
   if (request.method === "POST" && saleMatch?.[1] !== undefined) {
     const body = await readJson(request);
     return sendJson(response, 200, sellGrade(context, saleMatch[1], body));
+  }
+  const bargainMatch = BARGAIN_ROUTE.exec(pathname);
+  if (request.method === "POST" && bargainMatch?.[1] !== undefined) {
+    await readJson(request);
+    return sendJson(response, 200, strikeBargain(context, bargainMatch[1]));
   }
   throw new HttpError(404, "Nothing here but water.");
 };

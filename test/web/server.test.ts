@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { GOAL, STORY_LIMIT } from "../../src/core/game.ts";
+import { BARGAIN_PRICE, BARGAIN_STORIES, GOAL, STORY_LIMIT } from "../../src/core/game.ts";
 import { type Judge, JudgeError } from "../../src/judge/judge.ts";
 import { MAX_BODY_BYTES } from "../../src/web/http.ts";
 import { type AppConfig, MAX_STORY_LENGTH } from "../../src/web/server.ts";
 import { nextDay, openMarket, pricesOf } from "../../src/core/market.ts";
 import type { Grade } from "../../src/core/pearls.ts";
 import type {
+  BargainResponse,
   GameView,
   GameResponse,
   SaleResponse,
@@ -30,6 +31,9 @@ const newGame = async (url: string): Promise<GameResponse> =>
 
 const tell = (url: string, id: string, story: unknown = "A sad story."): Promise<Response> =>
   post(`${url}/api/games/${id}/stories`, { story });
+
+const bargain = (url: string, id: string): Promise<Response> =>
+  post(`${url}/api/games/${id}/bargain`, {});
 
 const sell = (url: string, id: string, grade: unknown = "round"): Promise<Response> =>
   post(`${url}/api/games/${id}/sales`, { grade });
@@ -65,6 +69,7 @@ describe("starting a game", () => {
         { grade: "round", price: 15, standingPrice: 15, held: 0 },
         { grade: "black", price: 40, standingPrice: 40, held: 0 },
       ],
+      bargain: { stories: BARGAIN_STORIES, price: BARGAIN_PRICE },
     });
   });
 
@@ -278,6 +283,70 @@ describe("selling pearls", () => {
     expect(during.status).toBe(409);
     expect((await story).status).toBe(200);
     expect((await sell(url, id)).status).toBe(200);
+  });
+});
+
+describe("taking the witch's bargain", () => {
+  it("adds stories, raises the goal and withdraws the offer", async () => {
+    const url = await serve();
+    const { id } = await newGame(url);
+    const response = await bargain(url, id);
+    expect(response.status).toBe(200);
+    const { game } = (await response.json()) as BargainResponse;
+    expect(game.storiesLeft).toBe(STORY_LIMIT + BARGAIN_STORIES);
+    expect(game.goal).toBe(GOAL + BARGAIN_PRICE);
+    expect(game.bargain).toBeNull();
+  });
+
+  it("is offered only once", async () => {
+    const url = await serve();
+    const { id } = await newGame(url);
+    await bargain(url, id);
+    const again = await bargain(url, id);
+    expect(again.status).toBe(409);
+    expect(await errorOf(again)).toContain("only once");
+  });
+
+  it("leads to the bargain ending when the higher goal is reached", async () => {
+    const url = await serve({ judge: heartbreaking });
+    const { id } = await newGame(url);
+    await bargain(url, id);
+    // 32 black pearls reach 650 coins even at the lowest price of 24.
+    for (let told = 0; told < 4; told++) await tell(url, id);
+    const { game } = (await (await sell(url, id, "black")).json()) as SaleResponse;
+    expect(game.ending).toBe("bargain");
+  });
+
+  it("is refused once the game has ended", async () => {
+    const url = await serve({ judge: heartbreaking });
+    const { id } = await newGame(url);
+    for (let told = 0; told < 3; told++) await tell(url, id);
+    await sell(url, id, "black");
+    expect((await bargain(url, id)).status).toBe(409);
+  });
+
+  it("answers 404 for an unknown game", async () => {
+    const url = await serve();
+    expect((await bargain(url, "no-such-game")).status).toBe(404);
+  });
+
+  it("waits until the story being judged is done", async () => {
+    let release = (): void => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const judge: Judge = { name: "slow", judge: () => gate.then(() => SAD) };
+    const url = await serve({ judge });
+    const { id } = await newGame(url);
+
+    const story = tell(url, id);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const during = await bargain(url, id);
+    release();
+
+    expect(during.status).toBe(409);
+    expect((await story).status).toBe(200);
+    expect((await bargain(url, id)).status).toBe(200);
   });
 });
 

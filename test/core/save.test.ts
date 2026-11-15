@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { type GameState, newGame } from "../../src/core/game.ts";
+import { type GameState, newGame, takeBargain } from "../../src/core/game.ts";
 import { parseGameState } from "../../src/core/save.ts";
 import { move, playAll, seed } from "./arbitraries.ts";
 
@@ -27,6 +27,18 @@ describe("parseGameState", () => {
     expect(parseGameState(saved({ cheat: true }))).toEqual(newGame(1));
   });
 
+  it("reads a save from before the bargain existed as a game without one", () => {
+    const { bargained: _, ...older } = newGame(1);
+    expect(parseGameState(older)).toEqual(newGame(1));
+  });
+
+  it("allows the higher goal and the extra stories only with the bargain", () => {
+    const { goal, storiesLeft } = takeBargain(newGame(1));
+    expect(parseGameState(saved({ goal, storiesLeft, bargained: true }))).toBeDefined();
+    expect(parseGameState(saved({ goal }))).toBeUndefined();
+    expect(parseGameState(saved({ storiesLeft }))).toBeUndefined();
+  });
+
   it.each([
     ["nothing", undefined],
     ["text", "a game"],
@@ -42,6 +54,8 @@ describe("parseGameState", () => {
     ["a purse missing a grade", saved({ purse: { seed: 0, round: 0 } })],
     ["a negative purse", saved({ purse: { seed: 0, round: -3, black: 0 } })],
     ["no market", saved({ market: undefined })],
+    ["a bargain that is not yes or no", saved({ bargained: "yes" })],
+    ["a bargain without its higher goal", saved({ bargained: true })],
     ["a seed that is out of range", saved({ market: { ...newGame(1).market, seed: 2 ** 32 } })],
     [
       "a price outside the market's bounds",

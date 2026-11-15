@@ -11,6 +11,12 @@ export const GOAL = 500;
 /** Stories the player may tell before the witch's offer ends. */
 export const STORY_LIMIT = 12;
 
+/** Stories the sea witch adds when the player takes her bargain. */
+export const BARGAIN_STORIES = 3;
+
+/** Coins the bargain adds to the goal. */
+export const BARGAIN_PRICE = 150;
+
 export type GameState = {
   readonly coins: number;
   readonly goal: number;
@@ -20,6 +26,8 @@ export type GameState = {
   readonly purse: Purse;
   /** The merchant's prices today. They change after every story. */
   readonly market: Market;
+  /** Whether the witch's bargain was taken. She offers it once. */
+  readonly bargained: boolean;
 };
 
 export type GameStatus = "playing" | "won" | "lost";
@@ -67,6 +75,7 @@ export const newGame = (seed = 0): GameState => ({
   memory: [],
   purse: EMPTY_PURSE,
   market: openMarket(seed),
+  bargained: false,
 });
 
 export const statusOf = (state: GameState): GameStatus => {
@@ -133,5 +142,23 @@ export const sellPearls = (state: GameState, grade: Grade): Sold => {
   return {
     sale: { grade, count, price, coins },
     state: { ...state, coins: state.coins + coins, purse: withoutGrade(state.purse, grade) },
+  };
+};
+
+/** The witch offers her bargain once, and only while the game is in play. */
+export const canBargain = (state: GameState): boolean =>
+  statusOf(state) === "playing" && !state.bargained;
+
+/**
+ * Takes the sea witch's bargain: more stories, for a higher goal.
+ * Throws when it is not on offer: callers must check `canBargain` first.
+ */
+export const takeBargain = (state: GameState): GameState => {
+  if (!canBargain(state)) throw new Error("The witch's bargain is not on offer.");
+  return {
+    ...state,
+    goal: state.goal + BARGAIN_PRICE,
+    storiesLeft: state.storiesLeft + BARGAIN_STORIES,
+    bargained: true,
   };
 };

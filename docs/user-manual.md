@@ -48,6 +48,9 @@ game. Set `DEEPSEEK_API_KEY` (see Settings) to let the LLM judge.
 3. Sell pearls to the pearl merchant with the **Sell** buttons. His
    prices change after every story, so you may sell now or wait.
 4. Reach 500 coins within 12 stories to buy back her voice.
+5. Running short? The sea witch offers a bargain, once: 3 more stories,
+   but her price rises by 150 coins. It cannot be undone, and it must
+   be taken before your last story.
 
 Tips:
 
@@ -60,8 +63,8 @@ Tips:
 - After the last story everything left is sold at that day's price,
   good or bad.
 
-The tale has more than one ending. How quickly you win, or how close
-you come, decides which one you read.
+The tale has more than one ending. How quickly you win, how close you
+come, and whether you dealt with the witch decide which one you read.
 
 The exact rules are in [design/core.md](design/core.md).
 
