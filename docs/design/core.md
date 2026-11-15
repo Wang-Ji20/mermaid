@@ -155,6 +155,26 @@ Why this shape:
 - **Each grade moves alone**, so "sell the seed pearls, keep the black
   ones" can be the right call.
 
+### The merchant's mood
+
+`moodOf` sums the day up in one word, from the average of the three
+percentages:
+
+| Mood | Average price |
+|------|---------------|
+| `generous` | 107% or more |
+| `fair` | between |
+| `tight` | 93% or less |
+
+The page turns the mood into a line the merchant says. It tells the
+player nothing the prices do not: it is the same news in his voice. An
+average hides the grades, so on a `fair` day one grade can still be
+well worth selling.
+
+The margin of 7 points was picked by counting: over 500 games it makes
+about half the days `fair` and a quarter each of the others. At 10
+points he said the same line on seven days in ten.
+
 ### Chance without impurity
 
 The core may not call `Math.random`: its functions must give the same

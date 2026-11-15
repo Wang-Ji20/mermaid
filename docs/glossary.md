@@ -46,6 +46,9 @@ pieces of text between visits. The page keeps its game's id there.
 **LLM (large language model).** A program that reads text and writes
 text. Here it reads the player's story and writes the mermaid's reaction.
 
+**Mood.** The pearl merchant's day in one word: generous, fair or
+tight. It follows the average of his prices.
+
 **Numbness.** Sadness points a story loses because the mermaid has
 recently heard the same theme.
 

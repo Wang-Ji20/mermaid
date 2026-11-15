@@ -58,6 +58,8 @@ Tips:
 - Specific, personal stories give finer pearls, which sell for more.
 - She grows numb to themes she has heard in her last three stories.
   Vary what you tell her.
+- The merchant's first words tell you what kind of day it is. Each
+  grade still has its own price, so read the rows too.
 - Prices drift back toward the usual price. A low price will probably
   rise; a high one will probably fall.
 - After the last story everything left is sold at that day's price,

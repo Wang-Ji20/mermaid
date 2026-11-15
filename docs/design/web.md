@@ -45,6 +45,7 @@ Send `{}`. The answer:
   "game": {
     "coins": 0, "goal": 500, "storiesLeft": 12, "status": "playing",
     "ending": null, "bargain": { "stories": 3, "price": 150 },
+    "merchantMood": "fair",
     "stall": [
       { "grade": "seed", "price": 5, "standingPrice": 5, "held": 0 },
       { "grade": "round", "price": 15, "standingPrice": 15, "held": 0 },
@@ -57,6 +58,9 @@ Send `{}`. The answer:
 `ending` is `null` while the game is in play. Afterwards it names the
 ending: `swift`, `won`, `bargain`, `near` or `lost`
 ([core.md](core.md#goal-and-ending)).
+
+`merchantMood` is `generous`, `fair` or `tight`: today's prices summed
+up in a word ([core.md](core.md#the-merchants-mood)).
 
 `bargain` is the sea witch's offer. It is `null` once the offer is taken
 or the game is over.
@@ -134,6 +138,7 @@ Every error is `{ "error": "a sentence the page can show" }`.
 |  [==========--------------]              |
 |                                          |
 |  The pearl merchant                      |
+|  "An ordinary day, an ordinary price."   |
 |  o Seed pearls   4 each, below 5  [Sell] |
 |  O Round pearls  17 each, above 15 [Sell]|
 |  * Black pearls  40 each, usual   [Sell] |
@@ -164,6 +169,10 @@ can then see *why* a story earned what it did and learn to vary themes.
 Each sell button says what it would pay, such as "Sell 5 for 85". The
 price line says whether today is above or below the usual price, in
 words and not only in colour.
+
+The merchant says one line each day, chosen by the mood the server
+names. Like the endings, the rule is the server's and the words are the
+page's.
 
 The sea witch's box shows her offer in her own words, with the numbers
 from the server. It disappears once the bargain is taken. One click

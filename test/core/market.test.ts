@@ -4,7 +4,9 @@ import {
   MAX_PERCENT,
   MAX_SWING,
   MIN_PERCENT,
+  MOODS,
   type Market,
+  moodOf,
   nextDay,
   openMarket,
   priceOf,
@@ -75,6 +77,22 @@ describe("the pearl market", () => {
         );
       }),
     );
+  });
+
+  it.each([
+    ["fair", "every price is the usual one", { seed: 100, round: 100, black: 100 }],
+    ["fair", "high and low prices balance", { seed: 150, round: 60, black: 90 }],
+    ["generous", "prices are seven points up on average", { seed: 107, round: 107, black: 107 }],
+    ["fair", "prices are just under seven points up", { seed: 107, round: 107, black: 106 }],
+    ["tight", "prices are seven points down on average", { seed: 93, round: 93, black: 93 }],
+    ["fair", "prices are just under seven points down", { seed: 93, round: 93, black: 94 }],
+  ] as const)("finds the merchant %s when %s", (mood, _case, percent) => {
+    expect(moodOf({ seed: 1, percent })).toBe(mood);
+  });
+
+  it("gives the merchant every mood sooner or later", () => {
+    const seen = new Set(Array.from({ length: 60 }, (_, day) => moodOf(after(openMarket(1), day))));
+    expect([...seen].sort()).toEqual([...MOODS].sort());
   });
 
   it("accepts any number as a seed", () => {

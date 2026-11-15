@@ -9,7 +9,7 @@ import {
   statusOf,
 } from "../core/game.ts";
 import { type Ending, endingOf } from "../core/ending.ts";
-import { priceOf } from "../core/market.ts";
+import { type Mood, moodOf, priceOf } from "../core/market.ts";
 import { GRADES, type Grade, PEARL_PRICE } from "../core/pearls.ts";
 import type { Verdict } from "../core/verdict.ts";
 
@@ -41,6 +41,8 @@ export type GameView = {
   readonly status: GameStatus;
   /** How the game ended; `null` while it is in play. */
   readonly ending: Ending | null;
+  /** How freely the merchant pays today; the page gives him a line to match. */
+  readonly merchantMood: Mood;
   /** One row per grade, plainest first. */
   readonly stall: readonly StallRow[];
   /** The witch's offer; `null` once it is taken or the game is over. */
@@ -93,6 +95,7 @@ export const gameView = (state: GameState): GameView => ({
   storiesLeft: state.storiesLeft,
   status: statusOf(state),
   ending: endingOf(state) ?? null,
+  merchantMood: moodOf(state.market),
   stall: GRADES.map((grade) => stallRow(state, grade)),
   bargain: canBargain(state) ? { stories: BARGAIN_STORIES, price: BARGAIN_PRICE } : null,
 });

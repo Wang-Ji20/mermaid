@@ -64,6 +64,7 @@ describe("starting a game", () => {
       storiesLeft: STORY_LIMIT,
       status: "playing",
       ending: null,
+      merchantMood: "fair",
       stall: [
         { grade: "seed", price: 5, standingPrice: 5, held: 0 },
         { grade: "round", price: 15, standingPrice: 15, held: 0 },

@@ -22,6 +22,15 @@ const BARGAIN_STRUCK =
   "She nods to the witch, and does not look at you for a while. More stories to tell, " +
   "and a heavier purse to fill.";
 const LISTENING = "…";
+
+/** What the pearl merchant says, one line for each mood the server can name. */
+const MERCHANT_LINES = {
+  generous:
+    "“There is a wedding at court and every lady wants pearls. I pay well today, little one.”",
+  fair: "“An ordinary day, an ordinary price. Sell or keep, it is all one to me.”",
+  tight:
+    "“The boats came in heavy with pearls. I have more than I can sell, so I pay little today.”",
+};
 /** Where the browser keeps the id of the game in play, so a reload can resume it. */
 const GAME_ID_KEY = "mermaid-tears.game";
 const LOG_PREVIEW_LENGTH = 120;
@@ -88,6 +97,7 @@ const ui = {
   progress: element("progress", HTMLElement),
   progressFill: element("progress-fill", HTMLElement),
   market: element("market", HTMLElement),
+  merchant: element("merchant", HTMLElement),
   stall: element("stall", HTMLUListElement),
   sale: element("sale", HTMLElement),
   witch: element("witch", HTMLElement),
@@ -222,6 +232,7 @@ const offerText = ({ stories, price }) =>
 /** @param {GameView} game */
 const showGame = (game) => {
   ui.stall.replaceChildren(...game.stall.map(stallRow));
+  ui.merchant.textContent = MERCHANT_LINES[game.merchantMood];
   ui.witch.hidden = game.bargain === null;
   if (game.bargain !== null) ui.witchOffer.textContent = offerText(game.bargain);
   ui.coins.textContent = String(game.coins);

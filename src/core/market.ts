@@ -57,3 +57,21 @@ export const pricesOf = (market: Market): Prices => ({
   round: priceOf(market, "round"),
   black: priceOf(market, "black"),
 });
+
+/** How freely the merchant pays today, all grades taken together. */
+export const MOODS = ["generous", "fair", "tight"] as const;
+
+export type Mood = (typeof MOODS)[number];
+
+/** The average price must be this many points from standing to change his mood. */
+export const MOOD_MARGIN = 7;
+
+const averagePercent = ({ percent }: Market): number =>
+  GRADES.reduce((sum, grade) => sum + percent[grade], 0) / GRADES.length;
+
+/** The merchant's mood, from the average of today's prices. */
+export const moodOf = (market: Market): Mood => {
+  const average = averagePercent(market);
+  if (average >= STANDING_PERCENT + MOOD_MARGIN) return "generous";
+  return average <= STANDING_PERCENT - MOOD_MARGIN ? "tight" : "fair";
+};

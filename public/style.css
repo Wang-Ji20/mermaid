@@ -102,6 +102,12 @@ h2 {
   margin: 0 0 0.6rem;
 }
 
+.merchant {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
 .stall-price.high {
   color: var(--gold);
 }

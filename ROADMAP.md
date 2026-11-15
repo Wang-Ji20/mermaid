@@ -19,8 +19,13 @@ The long-term plan. Current work is tracked in [PLAN.md](PLAN.md).
 - [x] Games survive a server restart
 - [x] The page resumes its game after a reload
 
+## Version 4: more endings and characters
+
+- [x] Five endings, chosen by how the game was won or lost
+- [x] The sea witch and her bargain
+- [x] The pearl merchant's voice
+
 ## Later
 
 - [ ] Illustrations and sound
-- [ ] More endings and characters (the sea witch, the pearl merchant)
 - [ ] Hosting for more than one player: accounts, rate limits

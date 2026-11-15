@@ -74,7 +74,7 @@ The roadmap's "more endings and characters".
 - [x] Four endings: a swift win, a win, a near loss, a loss
 - [x] The sea witch's bargain: more stories for a higher price, once
 - [x] An ending for a voice won back through the bargain
-- [ ] The pearl merchant speaks: a line that fits the day's prices
+- [x] The pearl merchant speaks: a line that fits the day's prices
 
 ## Open
 
