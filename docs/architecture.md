@@ -39,7 +39,7 @@ involved.
 |-----------|--------|-----|
 | Core | `src/core/` | The rules. Pure functions, no input or output. |
 | Judge | `src/judge/` | Turns a story into a verdict. |
-| Server | `src/web/` | Holds the games and offers them over HTTP. |
+| Server | `src/web/` | Holds the games, saves them to a file and offers them over HTTP. |
 | Page | `public/` | What the player sees in the browser. |
 
 `src/main.ts` wires them together: it picks a judge and starts the
@@ -84,7 +84,8 @@ Server, in `src/web/` ([design/web.md](design/web.md)):
 | File | Holds |
 |------|-------|
 | `server.ts` | the routes: start a game, tell a story, sell pearls |
-| `games.ts` | the in-memory store of running games |
+| `games.ts` | the store of running games |
+| `saves.ts` | the save file that keeps games between runs |
 | `http.ts` | reading and writing JSON over HTTP |
 | `static.ts` | serving the page's files |
 | `view.ts` | the shapes of the data sent to the page |

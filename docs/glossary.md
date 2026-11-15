@@ -58,6 +58,9 @@ library for these.
 **Pure function.** A function whose result depends only on its inputs
 and that changes nothing else. Easy to test.
 
+**Save file.** The file the server writes its games to, so they survive
+a restart.
+
 **Score.** A whole number from 0 (unmoved) to 10 (heartbroken).
 
 **Seed (random).** A number that decides a whole sequence of "random"

@@ -189,14 +189,43 @@ The core cannot roll dice, so the server does it once, when a game
 starts (`randomSeed` in `games.ts`). Tests hand the store a fixed seed
 and so know every price in advance.
 
-### Games live in memory
+### Games are saved in one file
 
-A `Map` from game id to state (`src/web/games.ts`). Restarting the
-server forgets all games. A game is twelve stories long, so this is
-acceptable for now. Saving games is on the roadmap.
+While the server runs, the games are a `Map` from game id to state
+(`src/web/games.ts`). After every change the whole map is also written
+to a **save file**, `saves/games.json` by default. At start the server
+reads the file back, so a restart loses nothing.
 
-The map holds at most 1000 games. When it is full, the oldest game is
-dropped. This stops the memory from growing without limit.
+```
+{ "version": 1,
+  "games": [ { "id": "0b1c...", "state": { "coins": 75, ... } }, ... ] }
+```
+
+- **The whole file each time.** A game is a few hundred bytes and the
+  store holds at most 1000, so one write is small. Writing only the
+  changed game would need a database or a file per game: more parts
+  than a local game needs.
+- **Written beside, then swapped.** The server writes `games.json.tmp`
+  and renames it over the old file. A crash in the middle leaves the
+  old file whole, never half a file.
+- **Nothing in the file is trusted.** Every game goes through
+  `parseGameState` ([core.md](core.md#saved-games)). A damaged game is
+  left out; the others still load. A file with another `version`
+  number, or one that is not JSON, counts as empty.
+- **A failed save does not stop the game.** The error is logged and
+  play goes on in memory. By then the judge has already been paid for
+  the story; losing the turn too would be worse than losing the save.
+- **`Saves` is a small interface** (`src/web/saves.ts`): `load` and
+  `save`. The store does not know about files, so its tests run
+  without touching the disk.
+
+The store holds at most 1000 games. When it is full, the oldest game is
+dropped, from memory and from the file. This stops both from growing
+without limit. Finished games wait there until they are the oldest.
+
+The save file holds every market seed. Anyone who can read it can work
+out tomorrow's prices. It sits on the player's own machine, so this
+only spoils their own game.
 
 ### One story at a time per game
 

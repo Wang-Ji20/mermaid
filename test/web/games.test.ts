@@ -1,10 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { newGame } from "../../src/core/game.ts";
-import { MAX_GAMES, createGameStore } from "../../src/web/games.ts";
+import { createGameStore } from "../../src/web/games.ts";
+import type { SavedGame, Saves } from "../../src/web/saves.ts";
+
+/** Saves kept in a list, so a second store can load what the first saved. */
+const memorySaves = (start: readonly SavedGame[] = []): Saves => {
+  let kept = start;
+  return {
+    load: () => kept,
+    save: (games) => {
+      kept = games;
+    },
+  };
+};
 
 describe("createGameStore", () => {
   it("creates a fresh game", () => {
-    const store = createGameStore(MAX_GAMES, () => 7);
+    const store = createGameStore({ seedFor: () => 7 });
     expect(store.get(store.create())).toEqual(newGame(7));
   });
 
@@ -23,7 +35,7 @@ describe("createGameStore", () => {
   });
 
   it("drops the oldest game when full", () => {
-    const store = createGameStore(2);
+    const store = createGameStore({ maxGames: 2 });
     const [first, second, third] = [store.create(), store.create(), store.create()];
     expect(store.get(first)).toBeUndefined();
     expect(store.get(second)).toBeDefined();
@@ -31,7 +43,7 @@ describe("createGameStore", () => {
   });
 
   it("does not bring back a dropped game on save", () => {
-    const store = createGameStore(1);
+    const store = createGameStore({ maxGames: 1 });
     const first = store.create();
     store.create();
     store.set(first, newGame());
@@ -47,5 +59,41 @@ describe("createGameStore", () => {
     expect(store.lock(id)).toBe(false);
     store.unlock(id);
     expect(store.lock(id)).toBe(true);
+  });
+
+  it("finds its games again after a restart", () => {
+    const saves = memorySaves();
+    const before = createGameStore({ saves });
+    const [first, second] = [before.create(), before.create()];
+    const richer = { ...newGame(3), coins: 75 };
+    before.set(second, richer);
+
+    const after = createGameStore({ saves });
+    expect(after.get(first)).toEqual(before.get(first));
+    expect(after.get(second)).toEqual(richer);
+  });
+
+  it("forgets a dropped game for good", () => {
+    const saves = memorySaves();
+    const before = createGameStore({ maxGames: 1, saves });
+    const first = before.create();
+    before.create();
+    expect(createGameStore({ saves }).get(first)).toBeUndefined();
+  });
+
+  it("loads only the newest games when more were saved than it may hold", () => {
+    const saved = ["old", "middle", "new"].map((id) => ({ id, state: newGame() }));
+    const store = createGameStore({ maxGames: 2, saves: memorySaves(saved) });
+    expect(store.get("old")).toBeUndefined();
+    expect(store.get("middle")).toBeDefined();
+    expect(store.get("new")).toBeDefined();
+  });
+
+  it("still drops the oldest game first after a restart", () => {
+    const saved = ["old", "new"].map((id) => ({ id, state: newGame() }));
+    const store = createGameStore({ maxGames: 2, saves: memorySaves(saved) });
+    store.create();
+    expect(store.get("old")).toBeUndefined();
+    expect(store.get("new")).toBeDefined();
   });
 });

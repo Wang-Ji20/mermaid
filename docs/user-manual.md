@@ -62,6 +62,14 @@ Tips:
 
 The exact rules are in [design/core.md](design/core.md).
 
+## Saved games
+
+The server saves every game after each story and each sale, in
+`saves/games.json`. Stop the server and start it again: the games are
+still there.
+
+To throw all games away, stop the server and delete that file.
+
 ## Settings
 
 Settings are environment variables.
@@ -73,6 +81,7 @@ Settings are environment variables.
 | `DEEPSEEK_BASE_URL` | DeepSeek API address | `https://api.deepseek.com` |
 | `PORT` | port the server listens on | `3000` |
 | `HOST` | address the server listens on | `127.0.0.1` |
+| `SAVE_FILE` | file the games are saved in; set it to nothing (`SAVE_FILE=`) to turn saving off | `saves/games.json` in the project folder |
 
 Example:
 

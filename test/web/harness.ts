@@ -1,7 +1,7 @@
 import type { AddressInfo } from "node:net";
 import type { Verdict } from "../../src/core/verdict.ts";
 import type { Judge } from "../../src/judge/judge.ts";
-import { MAX_GAMES, createGameStore } from "../../src/web/games.ts";
+import { createGameStore } from "../../src/web/games.ts";
 import { type AppConfig, createApp } from "../../src/web/server.ts";
 
 /** Helpers that run the real server on a free local port. */
@@ -23,7 +23,7 @@ export type Running = {
 };
 
 export const start = async (config: Partial<AppConfig> = {}): Promise<Running> => {
-  const store = createGameStore(MAX_GAMES, () => TEST_SEED);
+  const store = createGameStore({ seedFor: () => TEST_SEED });
   const app = createApp({ judge: fixedJudge(), store, ...config });
   await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve));
   const { port } = app.address() as AddressInfo;
