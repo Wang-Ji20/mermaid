@@ -14,6 +14,9 @@ state. It does no input or output.
 
 **DeepSeek.** The company whose LLM the game calls over the internet.
 
+**Ending.** The last page of the tale. Which one the player reads
+depends on how the game was won or lost.
+
 **Felt sadness.** A story's sadness score after numbness is taken off.
 It decides how many pearls she cries.
 

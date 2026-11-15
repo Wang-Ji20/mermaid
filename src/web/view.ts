@@ -5,6 +5,7 @@ import {
   type TurnOutcome,
   statusOf,
 } from "../core/game.ts";
+import { type Ending, endingOf } from "../core/ending.ts";
 import { priceOf } from "../core/market.ts";
 import { GRADES, type Grade, PEARL_PRICE } from "../core/pearls.ts";
 import type { Verdict } from "../core/verdict.ts";
@@ -29,6 +30,8 @@ export type GameView = {
   readonly goal: number;
   readonly storiesLeft: number;
   readonly status: GameStatus;
+  /** How the game ended; `null` while it is in play. */
+  readonly ending: Ending | null;
   /** One row per grade, plainest first. */
   readonly stall: readonly StallRow[];
 };
@@ -73,6 +76,7 @@ export const gameView = (state: GameState): GameView => ({
   goal: state.goal,
   storiesLeft: state.storiesLeft,
   status: statusOf(state),
+  ending: endingOf(state) ?? null,
   stall: GRADES.map((grade) => stallRow(state, grade)),
 });
 

@@ -59,6 +59,7 @@ describe("starting a game", () => {
       goal: GOAL,
       storiesLeft: STORY_LIMIT,
       status: "playing",
+      ending: null,
       stall: [
         { grade: "seed", price: 5, standingPrice: 5, held: 0 },
         { grade: "round", price: 15, standingPrice: 15, held: 0 },
@@ -144,6 +145,7 @@ describe("telling a story", () => {
     expect(game.coins).toBe(turn.closingSale);
     expect(held(game, "seed")).toBe(0);
     expect(game.status).toBe("lost");
+    expect(game.ending).toBe("lost");
   });
 
   it.each([
@@ -228,6 +230,7 @@ describe("selling pearls", () => {
     for (let told = 0; told < 3; told++) await tell(url, id);
     const { game } = (await (await sell(url, id, "black")).json()) as SaleResponse;
     expect(game.status).toBe("won");
+    expect(game.ending).toBe("swift");
     expect((await tell(url, id)).status).toBe(409);
     expect((await sell(url, id, "black")).status).toBe(409);
   });

@@ -60,6 +60,9 @@ Tips:
 - After the last story everything left is sold at that day's price,
   good or bad.
 
+The tale has more than one ending. How quickly you win, or how close
+you come, decides which one you read.
+
 The exact rules are in [design/core.md](design/core.md).
 
 ## Saved games

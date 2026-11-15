@@ -66,6 +66,21 @@ has 12 stories.
 - Reach 500 coins: **won**.
 - Use all 12 stories first: **lost**.
 
+How the game was won or lost picks one of four **endings**
+(`ending.ts`):
+
+| Ending | When |
+|--------|------|
+| `swift` | won with 6 or more stories untold |
+| `won` | any other win |
+| `near` | lost with at least four fifths of the goal (400 coins) |
+| `lost` | any other loss |
+
+The ending changes only the last page of the tale. A near loss is still
+a loss: the rules do not bend at the end, the story does. The core
+names the ending and the page holds the words, so the thresholds are
+tested like any other rule.
+
 A solid story is worth about 75 coins at standing prices, so 7 good,
 varied stories win. A good eye for the market needs fewer; selling on
 bad days needs more. The limit gives each story weight.
@@ -190,3 +205,5 @@ Where the save file lives is the server's business: see
 - The same seed always gives the same prices.
 - A saved game reads back exactly as it was. Damaged data never crashes
   the parser.
+- Every finished game has an ending that fits how it finished; a game in
+  play has none.

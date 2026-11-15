@@ -22,13 +22,30 @@ const GAME_ID_KEY = "mermaid-tears.game";
 const LOG_PREVIEW_LENGTH = 120;
 const PEARL_STAGGER_MS = 120;
 
+/** The last page of the tale, one for each ending the server can name. */
 const ENDINGS = {
+  swift: {
+    title: "A song before the moon is full",
+    text:
+      "The sea witch has barely settled into her cave when the purse lands in front of her. She " +
+      "counts it twice and scowls: she had hoped to keep the voice a while. The little mermaid " +
+      "sings the whole way home, and somewhere in the song are your stories, " +
+      "every one of them.",
+  },
   won: {
     title: "Her voice returns",
     text:
       "The sea witch counts the coins twice, then opens her hand. The little mermaid tries one " +
       "note, and it comes out as a song. “Thank you,” she says aloud, “for trusting me with " +
       "your sorrows.”",
+  },
+  near: {
+    title: "Almost a song",
+    text:
+      "The purse is heavy, but not heavy enough, and the witch does not bargain. The pearl " +
+      "merchant, packing up his stall, presses a shell into the little mermaid's hand. Held to " +
+      "the ear it hums, faintly, like someone about to sing. She writes: “So close. I will " +
+      "keep your stories, and the shell.”",
   },
   lost: {
     title: "The tide goes out",
@@ -196,9 +213,9 @@ const showGame = (game) => {
   ui.form.hidden = over;
   ui.market.hidden = over;
   ui.ending.hidden = !over;
-  if (game.status !== "playing") {
-    ui.endingTitle.textContent = ENDINGS[game.status].title;
-    ui.endingText.textContent = ENDINGS[game.status].text;
+  if (game.ending !== null) {
+    ui.endingTitle.textContent = ENDINGS[game.ending].title;
+    ui.endingText.textContent = ENDINGS[game.ending].text;
   }
 };
 

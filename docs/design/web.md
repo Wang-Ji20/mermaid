@@ -44,6 +44,7 @@ Send `{}`. The answer:
   "maxStoryLength": 2000,
   "game": {
     "coins": 0, "goal": 500, "storiesLeft": 12, "status": "playing",
+    "ending": null,
     "stall": [
       { "grade": "seed", "price": 5, "standingPrice": 5, "held": 0 },
       { "grade": "round", "price": 15, "standingPrice": 15, "held": 0 },
@@ -52,6 +53,9 @@ Send `{}`. The answer:
   }
 }
 ```
+
+`ending` is `null` while the game is in play. Afterwards it names the
+ending: `swift`, `won`, `near` or `lost` ([core.md](core.md#goal-and-ending)).
 
 `stall` has one row per pearl grade: today's price, the usual price and
 how many pearls of that grade she holds. Every `game` in every answer
@@ -148,7 +152,8 @@ price line says whether today is above or below the usual price, in
 words and not only in colour.
 
 When the game ends, the story box and the merchant give way to the
-ending text.
+ending text. The page has one title and one text for each ending the
+server can name.
 "Begin again" starts a new game at any time.
 
 After a reload, or when the browser is opened again later, the page
