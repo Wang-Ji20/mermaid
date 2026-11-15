@@ -1,3 +1,4 @@
+import { isRecord } from "./record.ts";
 import { clampScore } from "./score.ts";
 import { FALLBACK_THEME, type Theme, isTheme } from "./themes.ts";
 
@@ -16,9 +17,6 @@ export type Verdict = {
 export const MAX_THEMES = 3;
 export const MAX_REPLY_LENGTH = 600;
 export const SILENT_REPLY = "The little mermaid looks at you in silence.";
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
 
 const parseScore = (raw: unknown): number => {
   if (typeof raw === "number") return clampScore(raw);

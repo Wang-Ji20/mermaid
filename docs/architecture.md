@@ -67,6 +67,8 @@ Core, in `src/core/` ([design/core.md](design/core.md)):
 | `market.ts` | the merchant's prices, changing day by day |
 | `purse.ts` | the pearls she holds and what they are worth |
 | `game.ts` | `GameState`, `playTurn`, `sellPearls`, win and lose |
+| `save.ts` | `parseGameState`: a saved game checked before it is played |
+| `record.ts` | `isRecord`, a helper for reading untrusted data |
 
 Judges, in `src/judge/` ([design/judge.md](design/judge.md)):
 

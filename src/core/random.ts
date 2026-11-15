@@ -7,7 +7,10 @@
 
 const SEED_STEP = 0x6d2b79f5;
 
-/** Any number as a valid seed: a whole number from 0 to 2^32 - 1. */
+/** The largest seed. */
+export const MAX_SEED = 2 ** 32 - 1;
+
+/** Any number as a valid seed: a whole number from 0 to `MAX_SEED`. */
 export const toSeed = (raw: number): number => (Number.isFinite(raw) ? raw >>> 0 : 0);
 
 /** The seed to use for the draw after this one. */

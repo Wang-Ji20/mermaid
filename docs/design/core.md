@@ -146,6 +146,35 @@ Decisions:
 The alternative was to keep selling automatic and only vary the price.
 Then the market would be noise: the player could not act on it.
 
+## Saved games
+
+A `GameState` is plain data: numbers, lists and small records. Saving a
+game is writing that data as JSON. Nothing has to be converted.
+
+Reading it back is the careful part. A save file can be cut short,
+edited by hand or left over from an older version. So `parseGameState`
+(`save.ts`) checks every field before a saved game is played again:
+
+```
+{ "coins": 75, "storiesLeft": 9, ... }   -->  the game, as it was
+{ "coins": -1, ... }                     -->  nothing
+{ "coins": 75 }   (fields missing)       -->  nothing
+```
+
+Decisions:
+
+- **Refuse, never repair.** `parseVerdict` fixes bad data by lowering
+  it, because a judge's mistake should only cost a story. A save is
+  different: any guess at a missing field could hand out coins or
+  change tomorrow's prices. A damaged game is dropped whole.
+- **The goal must match.** A save with another goal comes from other
+  rules. It is refused like any other damage.
+- **Extra fields are dropped.** Only the known fields are copied, so
+  nothing unknown rides along into the game.
+
+Where the save file lives is the server's business: see
+[web.md](web.md).
+
 ## Properties the tests check
 
 - Coins never go down, and each turn uses exactly one story.
@@ -159,3 +188,5 @@ Then the market would be noise: the player could not act on it.
 - Market prices stay within 60% to 150%, and a finer grade is never
   cheaper than a plainer one.
 - The same seed always gives the same prices.
+- A saved game reads back exactly as it was. Damaged data never crashes
+  the parser.

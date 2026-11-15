@@ -57,6 +57,16 @@ The first item of the "Later" list in the roadmap.
 - [x] HTTP API: sell pearls
 - [x] Web page: the merchant's prices, the purse, sell buttons
 
+## Step 7: save and load
+
+The first item left on the roadmap's "Later" list.
+
+- [x] `parseGameState`: a saved game checked before it is played
+- [ ] Save file: the server writes its games to disk and reads them
+      back at start
+- [ ] HTTP API: fetch a game by id
+- [ ] Web page: remember the game and resume it after a reload
+
 ## Open
 
 - [ ] Try the DeepSeek judge with a real key. Its request and parsing

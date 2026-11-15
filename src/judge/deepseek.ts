@@ -1,3 +1,4 @@
+import { isRecord } from "../core/record.ts";
 import { type Verdict, parseVerdict } from "../core/verdict.ts";
 import { type Judge, JudgeError } from "./judge.ts";
 import { buildMessages } from "./prompt.ts";
@@ -16,9 +17,6 @@ export type DeepSeekConfig = {
   /** Replaced in tests so they never touch the network. */
   readonly fetch?: typeof fetch;
 };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
 
 /** Pulls the text of the first answer out of a chat-completions response. */
 const contentOf = (body: unknown): string => {

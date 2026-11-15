@@ -10,11 +10,11 @@ import {
   statusOf,
 } from "../../src/core/game.ts";
 import { nextDay, pricesOf } from "../../src/core/market.ts";
-import { GRADES, type Grade } from "../../src/core/pearls.ts";
+import { GRADES } from "../../src/core/pearls.ts";
 import { EMPTY_PURSE, purseValue } from "../../src/core/purse.ts";
 import { MEMORY_SPAN } from "../../src/core/numbness.ts";
 import type { Verdict } from "../../src/core/verdict.ts";
-import { score, themes, verdict } from "./arbitraries.ts";
+import { move, playAll, score, seed, themes, verdict } from "./arbitraries.ts";
 
 const story = (overrides: Partial<Verdict> = {}): Verdict => ({
   sadness: 7,
@@ -23,21 +23,6 @@ const story = (overrides: Partial<Verdict> = {}): Verdict => ({
   reply: "Oh...",
   ...overrides,
 });
-
-const seed = fc.integer({ min: 0, max: 2 ** 32 - 1 });
-
-/** One thing a player can do: tell a (judged) story or sell a grade. */
-type Move = Verdict | Grade;
-const move: fc.Arbitrary<Move> = fc.oneof(verdict, fc.constantFrom(...GRADES));
-
-const play = (state: GameState, next: Move): GameState => {
-  if (statusOf(state) !== "playing") return state;
-  return typeof next === "string" ? sellPearls(state, next).state : playTurn(state, next).state;
-};
-
-/** Plays moves in order and stops when the game ends. */
-const playAll = (moves: readonly Move[], start: GameState = newGame()): GameState =>
-  moves.reduce(play, start);
 
 /** Coins in hand plus what the purse would fetch today. */
 const wealth = (state: GameState): number =>
