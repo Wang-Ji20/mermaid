@@ -34,6 +34,9 @@ text. Here it reads the player's story and writes the mermaid's reaction.
 **Numbness.** Sadness points a story loses because the mermaid has
 recently heard the same theme.
 
+**Market.** The pearl merchant's stall. Its prices change from day to
+day around each grade's standing price.
+
 **Offline judge.** A judge that scores by simple word rules without
 calling an LLM. Used when no API key is set.
 
@@ -48,6 +51,13 @@ library for these.
 and that changes nothing else. Easy to test.
 
 **Score.** A whole number from 0 (unmoved) to 10 (heartbroken).
+
+**Seed (random).** A number that decides a whole sequence of "random"
+numbers. The same seed always gives the same sequence. Not to be
+confused with a *seed pearl*, the smallest grade.
+
+**Standing price.** The usual price of a pearl grade. The market price
+moves around it.
 
 **Theme.** A label for what a story is about, such as `loss` or `war`.
 Themes come from a fixed list.

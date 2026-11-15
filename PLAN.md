@@ -47,6 +47,15 @@ The live checklist for current work. Long-term items live in
 - [x] Cleanup pass
 - [x] Docs complete
 
+## Step 6: pearl market
+
+The first item of the "Later" list in the roadmap.
+
+- [x] Price model: seeded, each grade drifts around its standing price
+- [ ] Purse: pearls are kept until sold; selling by grade
+- [ ] HTTP API: sell pearls
+- [ ] Web page: the merchant's prices, the purse, sell buttons
+
 ## Open
 
 - [ ] Try the DeepSeek judge with a real key. Its request and parsing

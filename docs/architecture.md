@@ -57,7 +57,9 @@ Core, in `src/core/` ([design/core.md](design/core.md)):
 | `themes.ts` | the fixed list of story themes |
 | `verdict.ts` | the `Verdict` type and `parseVerdict` |
 | `numbness.ts` | her memory of recent themes |
-| `pearls.ts` | pearl count, grade and price |
+| `pearls.ts` | pearl count, grade and standing price |
+| `random.ts` | seeded random numbers, so chance stays pure |
+| `market.ts` | the merchant's prices, changing day by day |
 | `game.ts` | `GameState`, `playTurn`, win and lose |
 
 Judges, in `src/judge/` ([design/judge.md](design/judge.md)):

@@ -71,9 +71,56 @@ There is no pearl inventory and no market yet. Each story's pearls turn
 into coins in the same turn. This keeps the first version small. A
 market with changing prices is on the [roadmap](../../ROADMAP.md).
 
+## The pearl market
+
+The price model lives in `market.ts`. It is not yet part of a turn:
+wiring it in is the next step in [PLAN.md](../../PLAN.md).
+
+Each grade has a **standing price** (the table above). The merchant's
+price for the day is a percentage of it, between 60% and 150%. Day one
+is 100% for every grade.
+
+Each new day, every grade moves on its own:
+
+```
+tomorrow = today
+         + a quarter of the way back to 100%
+         + a chance swing of -20 to +20 points
+```
+
+Example, round pearls (standing price 15):
+
+```
+day      1     2     3     4     5
+percent  100   92    80    102   101
+coins    15    14    12    15    15
+```
+
+Why this shape:
+
+- **The pull back to 100%** makes prices readable. A low price will
+  probably rise, a high one will probably fall. Waiting is a real
+  choice, not a coin flip.
+- **The bounds** keep a finer grade from ever being cheaper than a
+  plainer one: seed pearls cost at most 8 coins, round pearls 9 to 23,
+  black pearls at least 24.
+- **Each grade moves alone**, so "sell the seed pearls, keep the black
+  ones" can be the right call.
+
+### Chance without impurity
+
+The core may not call `Math.random`: its functions must give the same
+output for the same input. So the market carries a **seed**, a number
+that decides every future price. `random.ts` scrambles the seed into a
+swing and steps it forward. The same seed always replays the same
+prices, which is what lets the tests check them.
+
 ## Properties the tests check
 
 - Coins never go down, and each turn uses exactly one story.
 - A sadder story never gives fewer pearls.
 - A more original story never pays less.
 - Every game ends within 12 stories.
+- Market prices stay within 60% to 150%, and a finer grade is never
+  cheaper than a plainer one.
+- The same seed always gives the same prices.
