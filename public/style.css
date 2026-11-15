@@ -79,6 +79,77 @@ h2 {
   transition: width 0.8s ease;
 }
 
+/* The pearl merchant */
+
+.market {
+  margin-top: 1.2rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.9rem;
+}
+
+.market h2 {
+  margin: 0;
+}
+
+.market-note,
+.stall-price {
+  color: var(--mist);
+  font-size: 0.85rem;
+}
+
+.market-note {
+  margin: 0 0 0.6rem;
+}
+
+.stall-price.high {
+  color: var(--gold);
+}
+
+.stall-price.low {
+  color: var(--coral);
+}
+
+.stall {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stall li {
+  display: grid;
+  grid-template-columns: 1.2rem 7rem 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stall .pearl {
+  justify-self: center;
+}
+
+.stall-name::first-letter {
+  text-transform: uppercase;
+}
+
+button.sell {
+  min-width: 9.5rem;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+button.sell:disabled {
+  cursor: default;
+}
+
+.sale {
+  min-height: 1.5rem;
+  margin: 0.6rem 0 0;
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
 /* The mermaid and her sand */
 
 .scene {
@@ -164,6 +235,10 @@ h2 {
   background: radial-gradient(circle at 30% 30%, #fff, #e9e3ee 55%, #b9aec4);
   box-shadow: 0 1px 2px rgb(0 0 0 / 35%);
   animation: fall 0.6s ease-in backwards;
+}
+
+.pearl.still {
+  animation: none;
 }
 
 .pearl.seed {
@@ -326,6 +401,15 @@ footer {
 }
 
 @media (max-width: 30rem) {
+  .stall li {
+    grid-template-columns: 1.2rem 1fr auto;
+  }
+
+  .stall-price {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+
   .scene {
     flex-direction: column;
     align-items: center;

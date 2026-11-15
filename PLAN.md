@@ -52,9 +52,10 @@ The live checklist for current work. Long-term items live in
 The first item of the "Later" list in the roadmap.
 
 - [x] Price model: seeded, each grade drifts around its standing price
-- [ ] Purse: pearls are kept until sold; selling by grade
-- [ ] HTTP API: sell pearls
-- [ ] Web page: the merchant's prices, the purse, sell buttons
+- [x] Purse: pearls are kept until sold; selling by grade
+- [x] Closing sale after the last story
+- [x] HTTP API: sell pearls
+- [x] Web page: the merchant's prices, the purse, sell buttons
 
 ## Open
 

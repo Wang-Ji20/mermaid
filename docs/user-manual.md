@@ -43,9 +43,11 @@ game. Set `DEEPSEEK_API_KEY` (see Settings) to let the LLM judge.
 ## How to play
 
 1. Type a sad story and press **Tell her**.
-2. The mermaid answers. If the story moved her, pearls fall and are
-   sold for coins.
-3. Reach 500 coins within 12 stories to buy back her voice.
+2. The mermaid answers. If the story moved her, pearls fall into her
+   purse.
+3. Sell pearls to the pearl merchant with the **Sell** buttons. His
+   prices change after every story, so you may sell now or wait.
+4. Reach 500 coins within 12 stories to buy back her voice.
 
 Tips:
 
@@ -53,6 +55,10 @@ Tips:
 - Specific, personal stories give finer pearls, which sell for more.
 - She grows numb to themes she has heard in her last three stories.
   Vary what you tell her.
+- Prices drift back toward the usual price. A low price will probably
+  rise; a high one will probably fall.
+- After the last story everything left is sold at that day's price,
+  good or bad.
 
 The exact rules are in [design/core.md](design/core.md).
 

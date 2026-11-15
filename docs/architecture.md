@@ -3,9 +3,10 @@
 ## The game in one paragraph
 
 The player types a sad story. The little mermaid reads it and reacts. If
-it moves her, she cries, and her tears are pearls. She sells the pearls
-for coins and saves toward a goal: buying her voice back from the sea
-witch.
+it moves her, she cries, and her tears are pearls. She keeps them in a
+purse and sells them to the pearl merchant, whose prices change after
+every story. The coins go toward a goal: buying her voice back from the
+sea witch.
 
 ## Data flow
 
@@ -20,13 +21,17 @@ witch.
       |                +-----------+
       |  reply, pearls,|   Core    |
       +--------------- | src/core/ |
-         coins         +-----------+
+         prices        +-----------+
 ```
 
 1. The page sends the story to the server.
 2. The server asks the judge for a verdict.
-3. The core turns the verdict into pearls and coins.
+3. The core turns the verdict into pearls, puts them in the purse and
+   moves the market to a new day.
 4. The server sends the result back and the page shows it.
+
+Selling is a shorter trip: page, server, core and back. The judge is not
+involved.
 
 ## Components
 
@@ -60,7 +65,8 @@ Core, in `src/core/` ([design/core.md](design/core.md)):
 | `pearls.ts` | pearl count, grade and standing price |
 | `random.ts` | seeded random numbers, so chance stays pure |
 | `market.ts` | the merchant's prices, changing day by day |
-| `game.ts` | `GameState`, `playTurn`, win and lose |
+| `purse.ts` | the pearls she holds and what they are worth |
+| `game.ts` | `GameState`, `playTurn`, `sellPearls`, win and lose |
 
 Judges, in `src/judge/` ([design/judge.md](design/judge.md)):
 
@@ -75,7 +81,7 @@ Server, in `src/web/` ([design/web.md](design/web.md)):
 
 | File | Holds |
 |------|-------|
-| `server.ts` | the routes: start a game, tell a story |
+| `server.ts` | the routes: start a game, tell a story, sell pearls |
 | `games.ts` | the in-memory store of running games |
 | `http.ts` | reading and writing JSON over HTTP |
 | `static.ts` | serving the page's files |
@@ -87,4 +93,4 @@ Page, in `public/` ([design/web.md](design/web.md)):
 |------|-------|
 | `index.html` | the layout and the mermaid drawing |
 | `style.css` | the look |
-| `app.js` | sends stories, shows results |
+| `app.js` | sends stories and sales, shows results |

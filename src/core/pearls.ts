@@ -3,7 +3,15 @@ export const GRADES = ["seed", "round", "black"] as const;
 /** Pearl quality, from tiny seed pearls to rare black pearls. */
 export type Grade = (typeof GRADES)[number];
 
-/** Coins the merchant pays for one pearl of each grade. */
+const KNOWN_GRADES: ReadonlySet<string> = new Set(GRADES);
+
+export const isGrade = (value: unknown): value is Grade =>
+  typeof value === "string" && KNOWN_GRADES.has(value);
+
+/**
+ * The standing price of one pearl of each grade, in coins. The market
+ * price of the day moves around it: see `market.ts`.
+ */
 export const PEARL_PRICE: Readonly<Record<Grade, number>> = {
   seed: 5,
   round: 15,
@@ -32,6 +40,3 @@ export const gradeFor = (originality: number): Grade => {
 /** One pearl at the first-tear threshold, one more for each point above. */
 export const pearlCountFor = (feltSadness: number): number =>
   Math.max(0, feltSadness - FIRST_TEAR_AT + 1);
-
-export const pearlValue = (pearls: Pearls): number =>
-  pearls.count * PEARL_PRICE[pearls.grade];

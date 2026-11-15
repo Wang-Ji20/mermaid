@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { newGame } from "../../src/core/game.ts";
-import { createGameStore } from "../../src/web/games.ts";
+import { MAX_GAMES, createGameStore } from "../../src/web/games.ts";
 
 describe("createGameStore", () => {
   it("creates a fresh game", () => {
+    const store = createGameStore(MAX_GAMES, () => 7);
+    expect(store.get(store.create())).toEqual(newGame(7));
+  });
+
+  it("gives each game its own market seed", () => {
     const store = createGameStore();
-    expect(store.get(store.create())).toEqual(newGame());
+    const seeds = Array.from({ length: 5 }, () => store.get(store.create())?.market.seed);
+    expect(new Set(seeds).size).toBeGreaterThan(1);
   });
 
   it("saves a new state", () => {
@@ -35,7 +41,9 @@ describe("createGameStore", () => {
   it("locks a game once until it is unlocked", () => {
     const store = createGameStore();
     const id = store.create();
+    expect(store.isLocked(id)).toBe(false);
     expect(store.lock(id)).toBe(true);
+    expect(store.isLocked(id)).toBe(true);
     expect(store.lock(id)).toBe(false);
     store.unlock(id);
     expect(store.lock(id)).toBe(true);

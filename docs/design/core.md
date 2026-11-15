@@ -11,11 +11,15 @@ verdict { sadness 7, originality 5, themes [loss] }
    |  minus numbness (familiar themes)
    v
 felt sadness 7  -->  pearl count 5
-originality 5   -->  pearl grade "round" (15 coins each)
+originality 5   -->  pearl grade "round"
    |
    v
-5 x 15 = 75 coins
+5 round pearls go into her purse
+the market moves on to a new day
 ```
+
+The pearls become coins only when the player sells them. See
+[Selling](#selling).
 
 ## Pearl count
 
@@ -30,7 +34,7 @@ and one more for each point above.
 
 Fresh, personal stories make finer pearls.
 
-| Originality | Grade | Coins each |
+| Originality | Grade | Standing price |
 |-------------|-------|------------|
 | 0-3 | seed | 5 |
 | 4-7 | round | 15 |
@@ -62,19 +66,14 @@ has 12 stories.
 - Reach 500 coins: **won**.
 - Use all 12 stories first: **lost**.
 
-A solid story earns about 75 coins, so 7 good, varied stories win.
-The limit gives each story weight.
-
-## Why pearls are sold at once
-
-There is no pearl inventory and no market yet. Each story's pearls turn
-into coins in the same turn. This keeps the first version small. A
-market with changing prices is on the [roadmap](../../ROADMAP.md).
+A solid story is worth about 75 coins at standing prices, so 7 good,
+varied stories win. A good eye for the market needs fewer; selling on
+bad days needs more. The limit gives each story weight.
 
 ## The pearl market
 
-The price model lives in `market.ts`. It is not yet part of a turn:
-wiring it in is the next step in [PLAN.md](../../PLAN.md).
+The price model lives in `market.ts`. A **day** is one story: prices
+change each time a story is told, and at no other time.
 
 Each grade has a **standing price** (the table above). The merchant's
 price for the day is a percentage of it, between 60% and 150%. Day one
@@ -115,11 +114,47 @@ that decides every future price. `random.ts` scrambles the seed into a
 swing and steps it forward. The same seed always replays the same
 prices, which is what lets the tests check them.
 
+## Selling
+
+Pearls wait in the **purse** (`purse.ts`), counted by grade. Between
+stories the player may sell all pearls of one grade at today's price.
+
+```
+purse   seed 4   round 5   black 1        coins 120
+sell round at 17 coins each
+purse   seed 4   round 0   black 1        coins 205
+```
+
+Selling costs no story and does not move the market. Selling can win
+the game on the spot.
+
+Decisions:
+
+- **A whole grade at a time.** Selling half a grade would add a number
+  box to the page for little gain. Three buttons are enough to make
+  "sell these, keep those" possible.
+- **Prices move only when a story is told.** If time moved them, the
+  core would need a clock and would stop being pure. It also means the
+  player is never rushed.
+- **The closing sale.** After the last story there is no later day to
+  wait for. So `playTurn` sells the whole purse at that day's price.
+  Without this, a player could lose with a full purse, or the page would
+  need a pointless extra click.
+- **Coins are counted, not pearls.** A purse worth 600 coins has not won
+  yet. The game is won when the coins are in hand.
+
+The alternative was to keep selling automatic and only vary the price.
+Then the market would be noise: the player could not act on it.
+
 ## Properties the tests check
 
 - Coins never go down, and each turn uses exactly one story.
 - A sadder story never gives fewer pearls.
-- A more original story never pays less.
+- A more original story never gives less valuable pearls.
+- Every pearl stays in the purse until it is sold.
+- A sale swaps pearls for exactly their worth: coins plus purse value
+  stays the same.
+- When the stories run out, nothing is left unsold.
 - Every game ends within 12 stories.
 - Market prices stay within 60% to 150%, and a finer grade is never
   cheaper than a plainer one.

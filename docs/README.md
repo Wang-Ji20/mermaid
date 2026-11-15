@@ -10,4 +10,6 @@ Read in this order:
      this way
    - [judge.md](design/judge.md): why the LLM only scores and never
      decides rewards
+   - [web.md](design/web.md): the HTTP API, the page and why the server
+     holds the state
 5. [perf/](perf/README.md): performance goals, method and results

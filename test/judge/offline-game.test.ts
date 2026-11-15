@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { type GameState, newGame, playTurn, statusOf } from "../../src/core/game.ts";
+import { type GameState, newGame, playTurn, sellPearls, statusOf } from "../../src/core/game.ts";
+import { GRADES } from "../../src/core/pearls.ts";
 import { judgeOffline } from "../../src/judge/offline.ts";
 
 /**
@@ -18,17 +19,32 @@ const VARIED_STORIES = [
   "The puppy I found in the rain was sick. I kept her warm in my coat, but by morning she was gone and I buried her under the apple tree.",
 ];
 
+/** Market prices depend on the game's seed, so every check runs on many. */
+const SEEDS = Array.from({ length: 200 }, (_, seed) => seed);
+
+/** The plainest way to play: sell each story's pearls at once. */
+const sellEverything = (state: GameState): GameState =>
+  GRADES.reduce(
+    (selling, grade) =>
+      statusOf(selling) === "playing" ? sellPearls(selling, grade).state : selling,
+    state,
+  );
+
 const play = (state: GameState, story: string): GameState =>
-  statusOf(state) === "playing" ? playTurn(state, judgeOffline(story)).state : state;
+  statusOf(state) === "playing"
+    ? sellEverything(playTurn(state, judgeOffline(story)).state)
+    : state;
+
+const wins = (stories: readonly string[]): number =>
+  SEEDS.filter((seed) => statusOf(stories.reduce(play, newGame(seed))) === "won").length;
 
 describe("a game with the offline judge", () => {
-  it("can be won with varied sad stories", () => {
-    expect(statusOf(VARIED_STORIES.reduce(play, newGame()))).toBe("won");
+  it("is usually won with eight varied sad stories, whatever the market does", () => {
+    expect(wins(VARIED_STORIES)).toBeGreaterThan(SEEDS.length / 2);
   });
 
   it("cannot be won by repeating one story", () => {
     const [story = ""] = VARIED_STORIES;
-    const repeated = Array.from({ length: 12 }, () => story);
-    expect(statusOf(repeated.reduce(play, newGame()))).toBe("lost");
+    expect(wins(Array.from({ length: 12 }, () => story))).toBe(0);
   });
 });

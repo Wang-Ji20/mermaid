@@ -1,8 +1,13 @@
-import { randomUUID } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { type GameState, newGame } from "../core/game.ts";
 
 /** Games kept in memory. When full, the oldest game makes room. */
 export const MAX_GAMES = 1000;
+
+const SEED_COUNT = 2 ** 32;
+
+/** A fresh market seed, so every game sees different prices. */
+export const randomSeed = (): number => randomInt(SEED_COUNT);
 
 export type GameStore = {
   readonly create: () => string;
@@ -14,9 +19,14 @@ export type GameStore = {
    */
   readonly lock: (id: string) => boolean;
   readonly unlock: (id: string) => void;
+  readonly isLocked: (id: string) => boolean;
 };
 
-export const createGameStore = (maxGames: number = MAX_GAMES): GameStore => {
+/** `seedFor` picks each new game's market seed; tests pass a fixed one. */
+export const createGameStore = (
+  maxGames: number = MAX_GAMES,
+  seedFor: () => number = randomSeed,
+): GameStore => {
   // A Map lists its keys in insertion order, so the first key is the oldest.
   const games = new Map<string, GameState>();
   const locked = new Set<string>();
@@ -32,7 +42,7 @@ export const createGameStore = (maxGames: number = MAX_GAMES): GameStore => {
     create: () => {
       if (games.size >= maxGames) dropOldest();
       const id = randomUUID();
-      games.set(id, newGame());
+      games.set(id, newGame(seedFor()));
       return id;
     },
     get: (id) => games.get(id),
@@ -47,5 +57,6 @@ export const createGameStore = (maxGames: number = MAX_GAMES): GameStore => {
     unlock: (id) => {
       locked.delete(id);
     },
+    isLocked: (id) => locked.has(id),
   };
 };

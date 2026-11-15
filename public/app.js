@@ -1,12 +1,14 @@
 // @ts-check
-// The page. It holds no game rules: it sends stories to the server and
-// shows what comes back. Plain JavaScript, so the browser can run it
+// The page. It holds no game rules: it sends stories and sales to the
+// server and shows what comes back. Plain JavaScript, so the browser can run it
 // without a build step; the type check still covers it through JSDoc.
 
 /** @typedef {import("../src/web/view.ts").GameView} GameView */
+/** @typedef {import("../src/web/view.ts").StallRow} StallRow */
 /** @typedef {import("../src/web/view.ts").TurnView} TurnView */
 /** @typedef {import("../src/web/view.ts").NewGameResponse} NewGameResponse */
 /** @typedef {import("../src/web/view.ts").StoryResponse} StoryResponse */
+/** @typedef {import("../src/web/view.ts").SaleResponse} SaleResponse */
 
 const GREETING =
   "I sold my voice to the sea witch. She will sell it back for coins, and my tears are pearls. " +
@@ -51,6 +53,9 @@ const ui = {
   storiesLeft: element("stories-left", HTMLElement),
   progress: element("progress", HTMLElement),
   progressFill: element("progress-fill", HTMLElement),
+  market: element("market", HTMLElement),
+  stall: element("stall", HTMLUListElement),
+  sale: element("sale", HTMLElement),
   mermaid: element("mermaid", HTMLElement),
   reply: element("reply", HTMLElement),
   pearls: element("pearls", HTMLElement),
@@ -71,8 +76,11 @@ const ui = {
   restart: element("restart", HTMLButtonElement),
 };
 
-/** The current game's id and story length limit, set once a game starts. */
-const session = { id: "", maxStoryLength: 0 };
+/**
+ * The current game's id and story length limit, set once a game starts.
+ * `busy` is true while the server is working on a story or a sale.
+ */
+const session = { id: "", maxStoryLength: 0, busy: false };
 
 /**
  * Sends JSON to the server and returns its JSON answer.
@@ -103,8 +111,46 @@ const showNotice = (message) => {
   ui.notice.textContent = message ?? "";
 };
 
+/** @param {StallRow} row */
+const priceText = ({ price, standingPrice }) => {
+  if (price === standingPrice) return `${plural(price, "coin")} each, the usual price`;
+  const direction = price > standingPrice ? "above" : "below";
+  return `${plural(price, "coin")} each, ${direction} the usual ${standingPrice}`;
+};
+
+/** @param {StallRow} row */
+const sellButton = ({ grade, price, held }) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "sell";
+  // An empty row stays disabled even when the page is no longer busy.
+  button.dataset.empty = String(held === 0);
+  button.disabled = held === 0 || session.busy;
+  button.textContent = held === 0 ? "Nothing to sell" : `Sell ${held} for ${held * price}`;
+  button.addEventListener("click", () => void sellGrade(grade));
+  return button;
+};
+
+/** @param {StallRow} row */
+const stallRow = (row) => {
+  const pearl = document.createElement("span");
+  pearl.className = `pearl still ${row.grade}`;
+  const name = document.createElement("span");
+  name.className = "stall-name";
+  name.textContent = `${row.grade} pearls`;
+  const price = document.createElement("span");
+  price.className = "stall-price";
+  price.classList.toggle("high", row.price > row.standingPrice);
+  price.classList.toggle("low", row.price < row.standingPrice);
+  price.textContent = priceText(row);
+  const item = document.createElement("li");
+  item.append(pearl, name, price, sellButton(row));
+  return item;
+};
+
 /** @param {GameView} game */
 const showGame = (game) => {
+  ui.stall.replaceChildren(...game.stall.map(stallRow));
   ui.coins.textContent = String(game.coins);
   ui.goal.textContent = String(game.goal);
   ui.storiesLeft.textContent = String(game.storiesLeft);
@@ -114,6 +160,7 @@ const showGame = (game) => {
 
   const over = game.status !== "playing";
   ui.form.hidden = over;
+  ui.market.hidden = over;
   ui.ending.hidden = !over;
   if (game.status !== "playing") {
     ui.endingTitle.textContent = ENDINGS[game.status].title;
@@ -133,10 +180,19 @@ const showPearls = ({ grade, count }) => {
 };
 
 /** @param {TurnView} turn */
-const earnedText = ({ pearls, coinsEarned }) =>
-  pearls.count === 0
-    ? "No tears this time."
-    : `${plural(pearls.count, `${pearls.grade} pearl`)} · +${plural(coinsEarned, "coin")}`;
+const earnedText = ({ pearls, closingSale }) => {
+  const tears =
+    pearls.count === 0
+      ? "No tears this time."
+      : `${plural(pearls.count, `${pearls.grade} pearl`)} for her purse.`;
+  return closingSale === 0
+    ? tears
+    : `${tears} The merchant took all she had left for ${plural(closingSale, "coin")}.`;
+};
+
+/** @param {SaleResponse["sale"]} sale */
+const saleText = ({ grade, count, price, coins }) =>
+  `Sold ${plural(count, `${grade} pearl`)} at ${price} each: +${plural(coins, "coin")}.`;
 
 /** @param {TurnView} turn */
 const numbnessText = ({ numbness, echoed }) =>
@@ -179,13 +235,26 @@ const showCounter = () => {
   ui.counter.classList.toggle("over", length > session.maxStoryLength);
 };
 
+/**
+ * Locks the story box and the sell buttons while the server works.
+ * @param {boolean} busy
+ */
+const setBusy = (busy) => {
+  session.busy = busy;
+  ui.tell.disabled = busy;
+  ui.story.readOnly = busy;
+  for (const button of ui.stall.querySelectorAll("button")) {
+    button.disabled = busy || button.dataset.empty === "true";
+  }
+};
+
 /** @param {boolean} listening */
 const setListening = (listening) => {
-  ui.tell.disabled = listening;
-  ui.story.readOnly = listening;
+  setBusy(listening);
   ui.mermaid.classList.toggle("listening", listening);
   if (listening) {
     ui.reply.textContent = LISTENING;
+    ui.sale.textContent = "";
     clearTurn();
   }
 };
@@ -200,6 +269,7 @@ const startGame = async () => {
     ui.judge.textContent = started.judge;
     ui.reply.textContent = GREETING;
     clearTurn();
+    ui.sale.textContent = "";
     ui.log.replaceChildren();
     ui.logSection.hidden = true;
     ui.story.value = "";
@@ -229,6 +299,23 @@ const tellStory = async () => {
     showNotice(error instanceof Error ? error.message : String(error));
   } finally {
     setListening(false);
+  }
+};
+
+/** @param {StallRow["grade"]} grade */
+const sellGrade = async (grade) => {
+  if (session.busy) return;
+  showNotice(null);
+  setBusy(true);
+  try {
+    /** @type {SaleResponse} */
+    const { game, sale } = await post(`/api/games/${session.id}/sales`, { grade });
+    ui.sale.textContent = saleText(sale);
+    showGame(game);
+  } catch (error) {
+    showNotice(error instanceof Error ? error.message : String(error));
+  } finally {
+    setBusy(false);
   }
 };
 

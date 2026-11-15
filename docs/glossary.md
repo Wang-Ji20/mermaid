@@ -1,5 +1,8 @@
 # Glossary
 
+**Closing sale.** The sale of everything left in the purse after the
+last story, at that day's prices.
+
 **Clamp.** To force a number into a range. Clamping 1000 to the range
 0 to 10 gives 10.
 
@@ -13,6 +16,9 @@ state. It does no input or output.
 
 **Felt sadness.** A story's sadness score after numbness is taken off.
 It decides how many pearls she cries.
+
+**Day.** One step of the market. A new day starts each time a story is
+told.
 
 **Grade.** The quality of a pearl: seed, round or black. Finer grades
 sell for more.
@@ -46,6 +52,8 @@ decides the pearl grade.
 **Property test.** A test that checks a rule on many random inputs, for
 example "the score is always between 0 and 10". We use the fast-check
 library for these.
+
+**Purse.** The pearls the mermaid has cried but not yet sold.
 
 **Pure function.** A function whose result depends only on its inputs
 and that changes nothing else. Easy to test.
