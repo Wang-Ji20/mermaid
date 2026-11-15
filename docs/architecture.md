@@ -83,7 +83,7 @@ Server, in `src/web/` ([design/web.md](design/web.md)):
 
 | File | Holds |
 |------|-------|
-| `server.ts` | the routes: start a game, tell a story, sell pearls |
+| `server.ts` | the routes: start a game, fetch it, tell a story, sell pearls |
 | `games.ts` | the store of running games |
 | `saves.ts` | the save file that keeps games between runs |
 | `http.ts` | reading and writing JSON over HTTP |
@@ -96,4 +96,4 @@ Page, in `public/` ([design/web.md](design/web.md)):
 |------|-------|
 | `index.html` | the layout and the mermaid drawing |
 | `style.css` | the look |
-| `app.js` | sends stories and sales, shows results |
+| `app.js` | sends stories and sales, shows results, resumes the game after a reload |

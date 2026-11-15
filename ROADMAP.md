@@ -14,9 +14,13 @@ The long-term plan. Current work is tracked in [PLAN.md](PLAN.md).
 - [x] Prices that change from day to day
 - [x] A purse: keep pearls and choose when to sell
 
+## Version 3: save and load
+
+- [x] Games survive a server restart
+- [x] The page resumes its game after a reload
+
 ## Later
 
-- [ ] Save and load
 - [ ] Illustrations and sound
 - [ ] More endings and characters (the sea witch, the pearl merchant)
 - [ ] Hosting for more than one player: accounts, rate limits

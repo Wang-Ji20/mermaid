@@ -6,14 +6,19 @@
 /** @typedef {import("../src/web/view.ts").GameView} GameView */
 /** @typedef {import("../src/web/view.ts").StallRow} StallRow */
 /** @typedef {import("../src/web/view.ts").TurnView} TurnView */
-/** @typedef {import("../src/web/view.ts").NewGameResponse} NewGameResponse */
+/** @typedef {import("../src/web/view.ts").GameResponse} GameResponse */
 /** @typedef {import("../src/web/view.ts").StoryResponse} StoryResponse */
 /** @typedef {import("../src/web/view.ts").SaleResponse} SaleResponse */
 
 const GREETING =
   "I sold my voice to the sea witch. She will sell it back for coins, and my tears are pearls. " +
   "Will you tell me something sad?";
+const WELCOME_BACK =
+  "You came back. I kept my purse closed while you were away. Will you tell me another?";
+const TALE_TOLD = "Our tale is told. Begin again, and I will listen as if for the first time.";
 const LISTENING = "…";
+/** Where the browser keeps the id of the game in play, so a reload can resume it. */
+const GAME_ID_KEY = "mermaid-tears.game";
 const LOG_PREVIEW_LENGTH = 120;
 const PEARL_STAGGER_MS = 120;
 
@@ -83,23 +88,52 @@ const ui = {
 const session = { id: "", maxStoryLength: 0, busy: false };
 
 /**
- * Sends JSON to the server and returns its JSON answer.
+ * Calls the server and returns its JSON answer.
  * Rejects with the server's own message when the call fails.
  * @param {string} path
- * @param {unknown} body
+ * @param {RequestInit} [options]
  * @returns {Promise<any>}
  */
-const post = async (path, body) => {
-  const response = await fetch(path, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  }).catch(() => {
+const call = async (path, options) => {
+  const response = await fetch(path, options).catch(() => {
     throw new Error("The game server cannot be reached. Is it still running?");
   });
   const answer = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(answer.error ?? "Something went wrong.");
   return answer;
+};
+
+/**
+ * Sends JSON to the server and returns its JSON answer.
+ * @param {string} path
+ * @param {unknown} body
+ */
+const post = (path, body) =>
+  call(path, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+// Browser storage can be switched off or full. The game then still plays;
+// it just cannot be resumed after a reload.
+
+/** @param {string} id */
+const rememberGame = (id) => {
+  try {
+    localStorage.setItem(GAME_ID_KEY, id);
+  } catch {
+    // Nothing to do: see above.
+  }
+};
+
+/** @returns {string | null} */
+const rememberedGame = () => {
+  try {
+    return localStorage.getItem(GAME_ID_KEY);
+  } catch {
+    return null;
+  }
 };
 
 /** @param {number} count @param {string} noun */
@@ -259,25 +293,55 @@ const setListening = (listening) => {
   }
 };
 
+/**
+ * Shows a game from its beginning or from where it was left.
+ * @param {GameResponse} entered
+ * @param {string} greeting
+ */
+const enterGame = ({ id, judge, maxStoryLength, game }, greeting) => {
+  session.id = id;
+  session.maxStoryLength = maxStoryLength;
+  rememberGame(id);
+  ui.judge.textContent = judge;
+  ui.reply.textContent = greeting;
+  clearTurn();
+  ui.sale.textContent = "";
+  ui.log.replaceChildren();
+  ui.logSection.hidden = true;
+  ui.story.value = "";
+  showCounter();
+  showGame(game);
+};
+
 const startGame = async () => {
   showNotice(null);
   try {
-    /** @type {NewGameResponse} */
-    const started = await post("/api/games", {});
-    session.id = started.id;
-    session.maxStoryLength = started.maxStoryLength;
-    ui.judge.textContent = started.judge;
-    ui.reply.textContent = GREETING;
-    clearTurn();
-    ui.sale.textContent = "";
-    ui.log.replaceChildren();
-    ui.logSection.hidden = true;
-    ui.story.value = "";
-    showCounter();
-    showGame(started.game);
+    enterGame(await post("/api/games", {}), GREETING);
   } catch (error) {
     showNotice(error instanceof Error ? error.message : String(error));
   }
+};
+
+/**
+ * Picks up the game this browser played last, if the server still has it.
+ * @returns {Promise<boolean>} whether a game was resumed
+ */
+const resumeGame = async () => {
+  const id = rememberedGame();
+  if (id === null) return false;
+  try {
+    /** @type {GameResponse} */
+    const resumed = await call(`/api/games/${encodeURIComponent(id)}`);
+    enterGame(resumed, resumed.game.status === "playing" ? WELCOME_BACK : TALE_TOLD);
+    return true;
+  } catch {
+    // The game is gone or the server is down. Starting afresh reports the latter.
+    return false;
+  }
+};
+
+const openPage = async () => {
+  if (!(await resumeGame())) await startGame();
 };
 
 const tellStory = async () => {
@@ -326,4 +390,4 @@ ui.form.addEventListener("submit", (event) => {
 ui.story.addEventListener("input", showCounter);
 ui.restart.addEventListener("click", () => void startGame());
 
-void startGame();
+void openPage();

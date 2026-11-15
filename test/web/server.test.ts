@@ -7,7 +7,7 @@ import { nextDay, openMarket, pricesOf } from "../../src/core/market.ts";
 import type { Grade } from "../../src/core/pearls.ts";
 import type {
   GameView,
-  NewGameResponse,
+  GameResponse,
   SaleResponse,
   StoryResponse,
 } from "../../src/web/view.ts";
@@ -25,8 +25,8 @@ afterEach(async () => {
   running = undefined;
 });
 
-const newGame = async (url: string): Promise<NewGameResponse> =>
-  (await (await post(`${url}/api/games`, {})).json()) as NewGameResponse;
+const newGame = async (url: string): Promise<GameResponse> =>
+  (await (await post(`${url}/api/games`, {})).json()) as GameResponse;
 
 const tell = (url: string, id: string, story: unknown = "A sad story."): Promise<Response> =>
   post(`${url}/api/games/${id}/stories`, { story });
@@ -51,7 +51,7 @@ describe("starting a game", () => {
     const url = await serve();
     const response = await post(`${url}/api/games`, {});
     expect(response.status).toBe(201);
-    const body = (await response.json()) as NewGameResponse;
+    const body = (await response.json()) as GameResponse;
     expect(body.judge).toBe("fixed");
     expect(body.maxStoryLength).toBe(MAX_STORY_LENGTH);
     expect(body.game).toEqual({
@@ -70,6 +70,40 @@ describe("starting a game", () => {
   it("gives every game its own id", async () => {
     const url = await serve();
     expect((await newGame(url)).id).not.toBe((await newGame(url)).id);
+  });
+});
+
+describe("fetching a game", () => {
+  const fetchGame = (url: string, id: string): Promise<Response> => fetch(`${url}/api/games/${id}`);
+
+  it("returns the game as it stands, with everything a fresh page needs", async () => {
+    const url = await serve();
+    const started = await newGame(url);
+    const { game } = (await (await tell(url, started.id)).json()) as StoryResponse;
+    const response = await fetchGame(url, started.id);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ...started, game });
+  });
+
+  it("changes nothing by looking", async () => {
+    const url = await serve();
+    const { id } = await newGame(url);
+    const first = await (await fetchGame(url, id)).json();
+    expect(await (await fetchGame(url, id)).json()).toEqual(first);
+  });
+
+  it("still returns a game that has ended", async () => {
+    const url = await serve({ judge: heartbreaking });
+    const { id } = await newGame(url);
+    for (let told = 0; told < 3; told++) await tell(url, id);
+    await sell(url, id, "black");
+    const { game } = (await (await fetchGame(url, id)).json()) as GameResponse;
+    expect(game.status).toBe("won");
+  });
+
+  it("answers 404 for an unknown game", async () => {
+    const url = await serve();
+    expect((await fetchGame(url, "no-such-game")).status).toBe(404);
   });
 });
 

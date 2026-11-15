@@ -34,6 +34,9 @@ can check plain JavaScript.
 **Judge.** The component that reads a story and returns a verdict. The
 real judge asks an LLM.
 
+**localStorage.** A place in the browser where a page may keep small
+pieces of text between visits. The page keeps its game's id there.
+
 **LLM (large language model).** A program that reads text and writes
 text. Here it reads the player's story and writes the mermaid's reaction.
 

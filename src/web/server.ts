@@ -6,7 +6,7 @@ import { type GameStore, createGameStore } from "./games.ts";
 import { HttpError, readJson, sendJson } from "./http.ts";
 import { DEFAULT_PUBLIC_DIR, serveStatic } from "./static.ts";
 import {
-  type NewGameResponse,
+  type GameResponse,
   type SaleResponse,
   type StoryResponse,
   gameView,
@@ -30,6 +30,7 @@ type Context = {
   readonly publicDir: string;
 };
 
+const GAME_ROUTE = /^\/api\/games\/([\w-]+)$/;
 const STORY_ROUTE = /^\/api\/games\/([\w-]+)\/stories$/;
 const SALE_ROUTE = /^\/api\/games\/([\w-]+)\/sales$/;
 
@@ -54,28 +55,37 @@ const gradeFrom = (body: unknown): Grade => {
   return grade;
 };
 
-/** The game with this id, if it exists and is still in play. */
-const gameInPlay = ({ store }: Context, id: string): GameState => {
+const NO_SUCH_GAME = "That game no longer exists.";
+
+/** The game with this id, ended or not. */
+const gameWithId = ({ store }: Context, id: string): GameState => {
   const state = store.get(id);
-  if (state === undefined) throw new HttpError(404, "That game no longer exists.");
+  if (state === undefined) throw new HttpError(404, NO_SUCH_GAME);
+  return state;
+};
+
+/** The game with this id, if it exists and is still in play. */
+const gameInPlay = (context: Context, id: string): GameState => {
+  const state = gameWithId(context, id);
   if (statusOf(state) !== "playing") throw new HttpError(409, "This tale has ended.");
   return state;
 };
 
-const startGame = ({ judge, store }: Context): NewGameResponse => {
-  const id = store.create();
-  const state = store.get(id);
-  if (state === undefined) throw new Error("A new game vanished from the store.");
-  return { id, judge: judge.name, maxStoryLength: MAX_STORY_LENGTH, game: gameView(state) };
-};
+/** Everything the page needs to show a game it has no memory of. */
+const fetchGame = (context: Context, id: string): GameResponse => ({
+  id,
+  judge: context.judge.name,
+  maxStoryLength: MAX_STORY_LENGTH,
+  game: gameView(gameWithId(context, id)),
+});
+
+const startGame = (context: Context): GameResponse => fetchGame(context, context.store.create());
 
 /** Judges one story and applies it. The caller holds the game's lock. */
 const judgeStory = async (context: Context, id: string, story: string): Promise<StoryResponse> => {
   const verdict = await context.judge.judge(story);
   // Read the state after the wait, in case the game was dropped meanwhile.
-  const state = context.store.get(id);
-  if (state === undefined) throw new HttpError(404, "That game no longer exists.");
-  const turn = playTurn(state, verdict);
+  const turn = playTurn(gameWithId(context, id), verdict);
   context.store.set(id, turn.state);
   return { game: gameView(turn.state), turn: turnView(verdict, turn.outcome) };
 };
@@ -114,6 +124,10 @@ const route = async (
   const { pathname } = new URL(request.url ?? "/", "http://localhost");
   if (request.method === "GET" && (await serveStatic(context.publicDir, pathname, response))) {
     return;
+  }
+  const gameMatch = GAME_ROUTE.exec(pathname);
+  if (request.method === "GET" && gameMatch?.[1] !== undefined) {
+    return sendJson(response, 200, fetchGame(context, gameMatch[1]));
   }
   if (request.method === "POST" && pathname === "/api/games") {
     await readJson(request);

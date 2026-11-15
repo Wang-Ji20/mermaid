@@ -36,8 +36,8 @@ export type GameView = {
 /** One told story: what the judge said and what it earned. */
 export type TurnView = Verdict & TurnOutcome;
 
-/** Answer to "start a game". */
-export type NewGameResponse = {
+/** Answer to "start a game" and to "fetch a game". */
+export type GameResponse = {
   readonly id: string;
   /** Name of the judge, so the page can say who is listening. */
   readonly judge: string;

@@ -4,7 +4,8 @@ I want to make a genAI little mermaid game where the little mermaid's tear is pe
 
 ## Status
 
-Playable in the browser. See [PLAN.md](PLAN.md) for current work and
+Playable in the browser. Games are saved, so you can stop and come
+back. See [PLAN.md](PLAN.md) for current work and
 [ROADMAP.md](ROADMAP.md) for the long-term plan.
 
 ## Quick start

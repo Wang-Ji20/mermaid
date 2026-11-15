@@ -68,6 +68,13 @@ The server saves every game after each story and each sale, in
 `saves/games.json`. Stop the server and start it again: the games are
 still there.
 
+Your browser remembers which game is yours. Reload the page or come
+back another day and it shows the same game: coins, purse, prices and
+stories left. Only the "Stories told" list starts empty, because your
+stories are not stored anywhere.
+
+**Begin again** leaves the old game and starts a new one.
+
 To throw all games away, stop the server and delete that file.
 
 ## Settings

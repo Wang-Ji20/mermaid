@@ -22,6 +22,11 @@ browser                     server                      judge
    | -----------------------> |  sellPearls (core)        |
    | <----------------------- |                           |
    |  { game, sale }          |                           |
+   |                          |                           |
+   |  GET /api/games/<id>     |    (after a reload)       |
+   | -----------------------> |  look the game up         |
+   | <----------------------- |                           |
+   |  { id, game }            |                           |
 ```
 
 ## The API
@@ -51,6 +56,14 @@ Send `{}`. The answer:
 `stall` has one row per pearl grade: today's price, the usual price and
 how many pearls of that grade she holds. Every `game` in every answer
 has this shape; the examples below shorten it.
+
+### Fetch a game: `GET /api/games/<id>`
+
+Sends nothing and changes nothing. The answer has the same shape as
+"start a game", with the game as it stands now. A game that has ended
+is still returned, so the page can show its ending.
+
+The page calls this after a reload to pick its game up again.
 
 ### Tell a story: `POST /api/games/<id>/stories`
 
@@ -138,6 +151,11 @@ When the game ends, the story box and the merchant give way to the
 ending text.
 "Begin again" starts a new game at any time.
 
+After a reload, or when the browser is opened again later, the page
+shows the same game: coins, purse, prices and stories left. The list of
+stories told starts empty again. See
+[The page remembers only the game's id](#the-page-remembers-only-the-games-id).
+
 ## Decisions
 
 ### The page holds no rules
@@ -182,6 +200,34 @@ out tomorrow's prices and the market would be no gamble at all.
 The alternative was to keep the state in the browser and send it with
 each story. That needs no storage on the server, but anyone could then
 send `coins: 499`.
+
+### The page remembers only the game's id
+
+The browser keeps one small thing in its own storage (`localStorage`,
+a place where a page may keep text between visits): the id of the game
+in play. On opening, the page asks the server for that game. If the
+server no longer has it, the page starts a new one.
+
+```
+open page --> id remembered? --no--> start a new game
+                   | yes
+                   v
+              GET /api/games/<id> --404--> start a new game
+                   | 200
+                   v
+              show the game where it was left
+```
+
+The state itself stays on the server, for the reason above: a state
+kept in the browser could be edited. An id cannot be turned into coins.
+
+The stories and the mermaid's replies are not kept anywhere. The server
+never stores what the player wrote, and sad stories are personal: the
+page does not leave them behind in the browser either. The price is
+that the "Stories told" list is empty after a reload.
+
+If the browser's storage is switched off, the game plays as before. It
+just cannot be resumed.
 
 ### Each game gets a random market seed
 
@@ -239,7 +285,7 @@ that is already over.
 
 ### No web framework
 
-The server uses Node's built-in `http` module. There are three routes;
+The server uses Node's built-in `http` module. There are four routes;
 a framework would be more code to learn than it saves.
 
 ### Only JSON bodies are accepted

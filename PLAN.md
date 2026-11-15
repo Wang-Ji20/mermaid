@@ -59,13 +59,13 @@ The first item of the "Later" list in the roadmap.
 
 ## Step 7: save and load
 
-The first item left on the roadmap's "Later" list.
+Version 3 in the roadmap.
 
 - [x] `parseGameState`: a saved game checked before it is played
 - [x] Save file: the server writes its games to disk and reads them
       back at start
-- [ ] HTTP API: fetch a game by id
-- [ ] Web page: remember the game and resume it after a reload
+- [x] HTTP API: fetch a game by id
+- [x] Web page: remember the game and resume it after a reload
 
 ## Open
 
